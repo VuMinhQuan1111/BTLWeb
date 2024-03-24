@@ -1,0 +1,53 @@
+﻿@model List<TblPost>
+
+@{
+    ViewData["Title"] = "IndexPost";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="title">
+        <h2>Blog ẩm thực</h2>
+    </div>
+    <div class="row">
+        <div class="sidebar col-4">
+            <h3>Bộ lọc</h3>
+
+        </div>
+            
+        <div class="content col-8">
+            <button type="button" class="btn btn-primary">Tạo Post mới</button>
+            <div style="border:1px solid gray; padding:10px;" class="post-card">
+                <div class="post-info">
+                    <div class="post-author">
+                        <h3>Được tạo bởi - Admin</h3>
+                    </div>
+                    <div class="post-create-at">
+                        <p>Thời gian tạo - 23/03/2024</p>
+                    </div>
+                </div>
+                <div class="post-title">
+                    <h3>Test Post</h3>
+                </div>
+                <div class="post-content">
+                    Hello World
+                </div>
+                <div class="post-category">
+                    <p>Food Category</p>
+                </div>
+                <div class="post-image">
+                    <img src="~/AdminAssets/images/products/s1.jpg" />
+                </div>
+                <div class="post-interact">
+                    <div class="post-favorite">
+                        Like
+                    </div>
+                    <div class="post-comment">
+                        <textarea placeholder="Type here"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,59 @@
+﻿@model BTLWeb.Models.TblPost
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>Create</h1>
+
+<h4>TblPost</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="UsersId" class="control-label"></label>
+                <select asp-for="UsersId" class ="form-control" asp-items="ViewBag.UsersId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryId" class="control-label"></label>
+                <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="PostTitle" class="control-label"></label>
+                <input asp-for="PostTitle" class="form-control" />
+                <span asp-validation-for="PostTitle" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PostContent" class="control-label"></label>
+                <input asp-for="PostContent" class="form-control" />
+                <span asp-validation-for="PostContent" class="text-danger"></span>
+            </div>
+            @* <div class="form-group">
+                <label asp-for="PostImg" class="control-label"></label>
+                <input asp-for="PostImg" class="form-control" />
+                <span asp-validation-for="PostImg" class="text-danger"></span>
+            </div> *@
+            <div class="form-group">
+                <label asp-for="PostAuthor" class="control-label"></label>
+                <input asp-for="PostAuthor" class="form-control" />
+                <span asp-validation-for="PostAuthor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PostCreateAt" class="control-label"></label>
+                <input asp-for="PostCreateAt" class="form-control" />
+                <span asp-validation-for="PostCreateAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

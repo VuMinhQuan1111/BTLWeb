@@ -1,0 +1,54 @@
+﻿@model IEnumerable<BTLWeb.Models.TblUser>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UsersName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UsersEmail)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UsersPass)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UsersRole)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UsersName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UsersEmail)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UsersPass)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UsersRole)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.UsersId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.UsersId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.UsersId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

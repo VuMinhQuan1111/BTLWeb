@@ -1,0 +1,43 @@
+﻿@model BTLWeb.Models.TblUser
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>TblUser</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UsersName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UsersName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UsersEmail)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UsersEmail)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UsersPass)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UsersPass)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UsersRole)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UsersRole)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.UsersId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
