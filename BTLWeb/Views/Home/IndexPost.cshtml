@@ -12,42 +12,50 @@
     <div class="row">
         <div class="sidebar col-4">
             <h3>Bộ lọc</h3>
-
-        </div>
+            @foreach(var check in Model)
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        <label class="form-check-label" for="flexCheckDefault">
+                        @check.PostTitle
+                    </label>
+                    </div>
+                </div>
+            }
             
-        <div class="content col-8">
-            <button type="button" class="btn btn-primary">Tạo Post mới</button>
-            <div style="border:1px solid gray; padding:10px;" class="post-card">
-                <div class="post-info">
-                    <div class="post-author">
-                        <h3>Được tạo bởi - Admin</h3>
-                    </div>
-                    <div class="post-create-at">
-                        <p>Thời gian tạo - 23/03/2024</p>
-                    </div>
-                </div>
-                <div class="post-title">
-                    <h3>Test Post</h3>
-                </div>
-                <div class="post-content">
-                    Hello World
-                </div>
-                <div class="post-category">
-                    <p>Food Category</p>
-                </div>
-                <div class="post-image">
-                    <img src="~/AdminAssets/images/products/s1.jpg" />
-                </div>
-                <div class="post-interact">
-                    <div class="post-favorite">
-                        Like
-                    </div>
-                    <div class="post-comment">
-                        <textarea placeholder="Type here"></textarea>
-                    </div>
-                </div>
-            </div>
         </div>
+        
+        
+            <div style="margin-bottom:10px" class="content col-8">
+            @foreach (var item in Model)
+            {
+                <div style="border:1px solid gray; padding:10px;" class="post-card">
+                    <div class="post-info">
+                        <div class="post-author">
+                            <h3>Được tạo bởi - @item.PostAuthor</h3>
+                        </div>
+                        <div class="post-create-at">
+                            <p>Thời gian tạo - @item.PostCreateAt</p>
+                        </div>
+                    </div>
+                    <div class="post-title">
+                        <a asp-action="PostDetail" asp-route-id="@item.PostId"><h3>@item.PostTitle</h3></a>
+                    </div>
+                    <div class="post-category">
+                        <h4>@item.Category</h4>
+                    </div>
+                    <div class="post-content">
+                        <p>@item.PostContent</p>
+                    </div>
+                    <div class="post-image">
+                        <a asp-action="PostDetail" asp-route-id="@item.PostId"><img src="@item.PostImg" /></a>
+                    </div>
+                </div>
+            }
+            </div>
+        
+        
     </div>
 </div>
 

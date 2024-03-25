@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BTLWeb.Models;
+using Microsoft.Extensions.Hosting;
 
 namespace BTLWeb.Areas.Admin.Controllers
 {
@@ -13,10 +14,12 @@ namespace BTLWeb.Areas.Admin.Controllers
     public class PostsController : Controller
     {
         private readonly BtlwebContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public PostsController(BtlwebContext context)
+        public PostsController(BtlwebContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+
         }
 
         // GET: Admin/Posts
@@ -59,15 +62,32 @@ namespace BTLWeb.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PostId,UsersId,CategoryId,PostTitle,PostContent,PostImg,PostAuthor,PostCreateAt")] TblPost tblPost)
+        public async Task<IActionResult> Create([Bind("PostId,UsersId,CategoryId,PostTitle,PostContent,PostImg,PostAuthor,PostCreateAt")] TblPost tblPost, IFormFile imageFile)
         {
-            if (ModelState.IsValid)
+            try
             {
+                if (imageFile != null)
+                {
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "PostImg");
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    await imageFile.CopyToAsync(new FileStream(filePath, FileMode.Create));
+                    tblPost.PostImg = "/PostImg/" + uniqueFileName;
+                }
+                /*if (ModelState.IsValid)
+                {*/
                 _context.Add(tblPost);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                /*}*/
             }
-            tblPost.PostCreateAt = DateTime.Now;
+            catch (DbUpdateException ex)
+            {
+
+                string errorMessage = ex.InnerException?.Message ?? ex.Message;
+                ViewBag.ErrorMessage = errorMessage;
+            }
+            
             ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryId", tblPost.CategoryId);
             ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersId", tblPost.UsersId);
             return View(tblPost);

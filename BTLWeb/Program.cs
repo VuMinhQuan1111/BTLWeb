@@ -9,6 +9,8 @@ var connectionString = builder.Configuration.GetConnectionString("BTLWeb");
 
 builder.Services.AddDbContext<BtlwebContext>(options => options.UseSqlServer(connectionString));
 
+builder.Services.AddSession();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,6 +27,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllerRoute(
     name: "areas",

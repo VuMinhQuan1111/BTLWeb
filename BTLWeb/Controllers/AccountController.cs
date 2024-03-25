@@ -10,6 +10,7 @@ namespace BTLWeb.Controllers
         // GET: AccountController
         private readonly ILogger<AccountController> _logger;
         private readonly BtlwebContext _context;
+        BtlwebContext db = new BtlwebContext();
 
         public AccountController(ILogger<AccountController> logger, BtlwebContext context)
         {
@@ -19,59 +20,36 @@ namespace BTLWeb.Controllers
         
         public IActionResult Index()
         {
-            
-            return View();
+            var listUsers = db.TblUsers.ToList();
+            return View(listUsers);
         }
 
+        [HttpGet]
         public IActionResult Login()
         {
-
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Login(TblUser _tblUser)
-        {
-            BtlwebContext _tblwebContext = new BtlwebContext();
-            /*string user = field["username"];
-            string pass = field["pass"];*/
-            /*TblUser rowuser = _context.TblUsers.Where(m => m.Role == "User" && (m.Name == user)).FirstOrDefault();*/
-            /*TblUser rowuser1 = _context.TblUsers.Where(m => m.Status == 1 && m.Role == "User" && (m.Name == user)).FirstOrDefault();*/
-            var status = _tblwebContext.TblUsers.Where(m => m.UsersName == _tblUser.UsersName && m.UsersPass == _tblUser.UsersPass).FirstOrDefault();
-            if(status == null)
-            {
-                ViewBag.ancap = "Mật khẩu sai rồi";
+            if(HttpContext.Session.GetString("UsersName") == null) {
+                return View();
             }
             else
             {
                 return RedirectToAction("Index", "Home");
             }
-            /*if (rowuser == null)
+            
+        }
+
+        [HttpPost]
+        public IActionResult Login(TblUser tblUser)
+        {
+            if (HttpContext.Session.GetString("UsersName") == null)
             {
-                ViewBag.ancap = "Tài khoản này không tồn tại";
-                *//*loginAttempts++;*//*
-            }
-            else if (rowuser1 == null)
-            {
-                ViewBag.ancap = "Tài khoản bị khóa";
-            }
-            else
-            {
-                // check tài khoản đúng thì check mật khẩu
-                if ((rowuser.Pass) == Encrypt.MD5Hash(pass))
+                var u = db.TblUsers.Where(x => x.UsersName.Equals(tblUser.UsersName) && x.UsersPass.Equals(tblUser.UsersPass)).FirstOrDefault();
+                if (u != null)
                 {
-                    HttpContext.Session.SetString("username", user);
-                    HttpContext.Session.SetString("id", rowuser.Id.ToString());
-                    *//*loginAttempts = 0;*//*
+                    HttpContext.Session.SetString("UsersName", u.UsersName.ToString());
                     return RedirectToAction("Index", "Home");
                 }
-                else
-                {
-                    ViewBag.ancap = "Mật khẩu sai rồi";
-                    *//*loginAttempts++;*//*
-                }
-            }*/
-            return View(_tblUser);
+            }
+            return View(tblUser);
         }
         public IActionResult Register()
         {
