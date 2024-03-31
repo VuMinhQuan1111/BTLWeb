@@ -11,15 +11,16 @@ public partial class TblUser
     [Key]
     public int UsersId { get; set; }
 
-    [Required(ErrorMessage = "Hãy điền đủ thông tin vào đây")]
+    [Required(ErrorMessage = "Hãy điền tên đăng nhập")]
     public string? UsersName { get; set; }
 
-    [Required(ErrorMessage = "Hãy điền đủ thông tin vào đây")]
+    [Required(ErrorMessage = "Hãy điền email")]
     [EmailAddress(ErrorMessage = "Email không hợp lệ")]
-    [RegularExpression(@"^.*@hou\.edu\.vn$", ErrorMessage = "Email phải có domain @hou.edu.vn")]
+    /*[RegularExpression(@"^.*@hou\.edu\.vn$", ErrorMessage = "Email phải có domain @hou.edu.vn")]*/
     public string? UsersEmail { get; set; }
 
-    [Required(ErrorMessage = "Hãy điền đủ thông tin vào đây")]
+    [Required(ErrorMessage = "Hãy điền mật khẩu")]
+    [MinLength(6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự")]
     public string? UsersPass { get; set; }
 
     public string? UsersRole { get; set; }

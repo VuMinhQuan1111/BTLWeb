@@ -66,6 +66,18 @@ namespace BTLWeb.Controllers
             return View();
         }
 
+        public IActionResult CreatePost()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreatePost(TblPost tblPost)
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

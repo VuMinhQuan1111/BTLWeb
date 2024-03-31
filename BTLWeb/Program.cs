@@ -7,7 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 var connectionString = builder.Configuration.GetConnectionString("BTLWeb");
 
-builder.Services.AddDbContext<BtlwebContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<BtlwebContext>(options => 
+options.UseSqlServer(connectionString));
 
 builder.Services.AddSession();
 
@@ -27,6 +28,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseAuthentication();
 
 app.UseSession();
 

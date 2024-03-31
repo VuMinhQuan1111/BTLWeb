@@ -6,8 +6,9 @@
 }
 
 <div class="container">
-    <div class="title">
-        <h2>Blog ẩm thực</h2>
+    <div class="text-center" style="background-image: url('/BannerImage/food-banner.jpg'); background-repeat: no-repeat; background-size: cover; padding:30px;">
+        <h1 style="color:white" class="display-4">Bài viết chia sẻ về Ẩm thực</h1>
+        
     </div>
     <div class="row">
         <div class="sidebar col-4">
@@ -28,6 +29,7 @@
         
         
             <div style="margin-bottom:10px" class="content col-8">
+            <button style="margin-bottom:10px" type="button" class="btn btn-primary">Tạo bài viết</button>
             @foreach (var item in Model)
             {
                 <div style="border:1px solid gray; padding:10px;" class="post-card">
@@ -49,7 +51,7 @@
                         <p>@item.PostContent</p>
                     </div>
                     <div class="post-image">
-                        <a asp-action="PostDetail" asp-route-id="@item.PostId"><img src="@item.PostImg" /></a>
+                        <a asp-action="PostDetail" asp-route-id="@item.PostId"><img src="/PostImg/@item.PostImg" /></a>
                     </div>
                 </div>
             }

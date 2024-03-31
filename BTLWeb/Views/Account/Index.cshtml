@@ -1,4 +1,5 @@
-﻿
+﻿@* @model List<BTLWeb.Models.TblUser> *@
+
 @{
     var userinfor = (List<BTLWeb.Models.TblUser>)ViewBag.userinfor;
     ViewData["Title"] = "Index";
@@ -18,13 +19,13 @@
                         </div>
                         <h4 class="mb-2">@item.UsersName</h4>
                         <h6 class="mb-2">@item.UsersEmail</h6>
-                        @* <p class="text-muted mb-4">
+                        <p class="text-muted mb-4">
                             <a href="@Url.Action("Changepass", "Account")">Đổi Mật Khẩu</a>
-                        </p> *@
+                        </p>
                         <div class="d-flex justify-content-between text-center mt-5 mb-2">
                             <div>
                                 <p class="mb-2 h5">0</p>
-                                <p class="text-muted mb-0">Bài Chia sẻ đã like</p>
+                                <p class="text-muted mb-0">Bài viết đã like</p>
                             </div>
                             @* <div class="px-3">
                                 <a href="@Url.Action("Likesonglist", "Account")">
@@ -36,6 +37,7 @@
                     </div>
                 </div>
             }
+            <button type="button" class="btn btn-primary">Tạo bài viết</button>
         </div>
     </div>
 </div>

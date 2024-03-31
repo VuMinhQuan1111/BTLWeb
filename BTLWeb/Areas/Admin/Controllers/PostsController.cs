@@ -19,7 +19,7 @@ namespace BTLWeb.Areas.Admin.Controllers
         public PostsController(BtlwebContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
-
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Admin/Posts
@@ -52,8 +52,8 @@ namespace BTLWeb.Areas.Admin.Controllers
         // GET: Admin/Posts/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryId");
-            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersId");
+            ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryName");
+            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName");
             return View();
         }
 
@@ -88,8 +88,8 @@ namespace BTLWeb.Areas.Admin.Controllers
                 ViewBag.ErrorMessage = errorMessage;
             }
             
-            ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryId", tblPost.CategoryId);
-            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersId", tblPost.UsersId);
+            ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryName", tblPost.CategoryId);
+            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPost.UsersId);
             return View(tblPost);
         }
 

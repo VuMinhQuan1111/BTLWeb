@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -25,9 +26,25 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="IndexPost">Post</a>
                         </li>
-                        <li class="nav-item">
+                        @{
+                            if (@Context.Session.GetString("UsersName") == null)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Please LogIn</a>
+                                </li>
+                            }
+                            else
+                            {
+                                    <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Index">Chào: @Context.Session.GetString("UsersName")</a>
+                                        
+                                    </li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="LogOut">Thoát</a></li>
+                            }
+                        }
+                        @* <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Index">Người dùng</a>
-                        </li>
+                        </li> *@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="Admin" asp-controller="Home" asp-action="Index">Admin</a>
                         </li>
@@ -44,7 +61,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - BTLWeb - <a asp-area="" asp-controller="Home" asp-action="Privacy">Quan</a>
+            &copy; @DateTime.Now.Year - BTLWeb - <a asp-area="" asp-controller="Home" asp-action="Privacy">Quan</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

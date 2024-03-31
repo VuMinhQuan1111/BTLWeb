@@ -1,4 +1,4 @@
-﻿
+﻿@model BTLWeb.Models.TblUser
 @{
     ViewData["Title"] = "Register";
     Layout = "~/Views/Shared/_Layout-Blank.cshtml";
@@ -17,25 +17,36 @@
                                     <img src="../AdminAssets/images/logos/dark-logo.svg" width="180" alt="">
                                 </a>
                                 <p class="text-center">Mạng xã hội Review về Ẩm thực</p>
-                                <form>
-                                    <div class="mb-3">
-                                        <label for="exampleInputtext1" class="form-label">Name</label>
-                                        <input type="text" class="form-control" id="exampleInputtext1" aria-describedby="textHelp">
+                                <p style="color: red">@ViewBag.alert</p>
+                            
+                            <form method="post" asp-area="" asp-controller="Account" asp-action="Register" class="login-form">
+                                <div class="form-group mb-3">
+                                        <label for="exampleInputtext1" class="form-label">User Name</label>
+                                        <input type="text" name="UsersName" class="form-control" id="exampleInputtext1" aria-describedby="textHelp">
+                                    <span asp-validation-for="UsersName" class="text-danger"></span>
                                     </div>
-                                    <div class="mb-3">
+                                <div class="form-group mb-3">
                                         <label for="exampleInputEmail1" class="form-label">Email Address</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                        <input type="email" name="UsersEmail" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                        <span asp-validation-for="UsersEmail" class="text-danger"></span>
                                     </div>
-                                    <div class="mb-4">
+                                <div class="form-group mb-4">
                                         <label for="exampleInputPassword1" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="exampleInputPassword1">
+                                        <input type="password" name="UsersPass" class="form-control" id="exampleInputPassword1">
+                                        <span asp-validation-for="UsersPass" class="text-danger"></span>
                                     </div>
-                                    <a href="./index.html" class="btn btn-primary w-100 fs-4 mb-4 rounded-2">Sign Up</a>
+                                    @* <a href="./index.html" class="btn btn-primary w-100 fs-4 mb-4 rounded-2">Sign Up</a> *@
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary rounded submit p-3 px-5">Đăng Ký</button>
+                                </div>
+                               
                                     <div class="d-flex align-items-center justify-content-center">
                                         <p class="fs-4 mb-0 fw-bold">Already have an Account?</p>
                                     <a class="text-primary fw-bold ms-2" asp-controller="Account" asp-action="Login">Sign In</a>
                                     </div>
                                 </form>
+                            
                             </div>
                         </div>
                     </div>
