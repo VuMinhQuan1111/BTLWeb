@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BTLWeb.Models;
 using Microsoft.Extensions.Hosting;
+using BTLWeb.Models.Dto;
+using Microsoft.AspNet.SignalR.Hosting;
 
 namespace BTLWeb.Areas.Admin.Controllers
 {
@@ -62,20 +64,38 @@ namespace BTLWeb.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PostId,UsersId,CategoryId,PostTitle,PostContent,PostImg,PostAuthor,PostCreateAt")] TblPost tblPost, IFormFile imageFile)
+        public async Task<IActionResult> Create([Bind("PostId,UsersId,CategoryId,PostTitle,PostContent,PostImg,PostAuthor,PostCreateAt")] TblPostDto tblPostDto, IFormFile imageFile)
         {
             try
             {
-                if (imageFile != null)
+                /*if (imageFile != null)
                 {
                     string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "PostImg");
                     string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                     await imageFile.CopyToAsync(new FileStream(filePath, FileMode.Create));
                     tblPost.PostImg = "/PostImg/" + uniqueFileName;
+                }*/
+                string newFileName = DateTime.Now.ToString("yyyyMMddHHmmssff");
+                newFileName += Path.GetExtension(tblPostDto.PostImg!.FileName);
+
+                string imageFullPath = _webHostEnvironment.WebRootPath + "/PostImg/" + newFileName;
+                using (var stream = System.IO.File.Create(imageFullPath)){
+                    tblPostDto.PostImg.CopyTo(stream);
                 }
-                /*if (ModelState.IsValid)
-                {*/
+                    /*if (ModelState.IsValid)
+                    {*/
+
+                    TblPost tblPost = new TblPost()
+                    {
+                        UsersId = tblPostDto.UsersId,
+                        CategoryId = tblPostDto.CategoryId,
+                        PostTitle = tblPostDto.PostTitle,
+                        PostContent = tblPostDto.PostContent,
+                        PostImg = newFileName,
+                        PostAuthor = tblPostDto.PostAuthor,
+                        PostCreateAt = DateTime.Now
+                    };
                 _context.Add(tblPost);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
@@ -88,9 +108,9 @@ namespace BTLWeb.Areas.Admin.Controllers
                 ViewBag.ErrorMessage = errorMessage;
             }
             
-            ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryName", tblPost.CategoryId);
-            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPost.UsersId);
-            return View(tblPost);
+            ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryName", tblPostDto.CategoryId);
+            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPostDto.UsersId);
+            return View(tblPostDto);
         }
 
         // GET: Admin/Posts/Edit/5
@@ -106,9 +126,23 @@ namespace BTLWeb.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryId", tblPost.CategoryId);
-            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersId", tblPost.UsersId);
-            return View(tblPost);
+
+            var tblPostDto = new TblPostDto()
+            {
+                
+                PostTitle = tblPost.PostTitle,
+                PostContent = tblPost.PostContent,
+                PostAuthor = tblPost.PostAuthor,
+                
+            };
+
+            ViewData["UserId"] = tblPost.UsersId;
+            ViewData["PostImg"] = tblPost.PostImg;
+            ViewData["PostCreateAt"] = tblPost.PostCreateAt.ToString("MM/dd/yyyy");
+
+            ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryName", tblPostDto.CategoryId);
+            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPostDto.UsersId);
+            return View(tblPostDto);
         }
 
         // POST: Admin/Posts/Edit/5
@@ -116,9 +150,23 @@ namespace BTLWeb.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PostId,UsersId,CategoryId,PostTitle,PostContent,PostImg,PostAuthor,PostCreateAt")] TblPost tblPost)
+        public async Task<IActionResult> Edit(int id, [Bind("PostId,UsersId,CategoryId,PostTitle,PostContent,PostImg,PostAuthor,PostCreateAt")] TblPostDto tblPostDto)
         {
-            if (id != tblPost.PostId)
+            var tblPost = _context.TblPosts.Find(id);
+            if( tblPost == null)
+            {
+                return RedirectToAction("Index", "Posts");
+            }
+
+            /*if (!ModelState.IsValid)
+            {
+                ViewData["UserId"] = tblPost.UsersId;
+                ViewData["PostImg"] = tblPost.PostImg;
+                ViewData["PostCreateAt"] = tblPost.PostCreateAt.ToString("MM/dd/yyyy");
+
+                return View(tblPostDto);
+            }*/
+            /*if (id != tblPost.PostId)
             {
                 return NotFound();
             }
@@ -142,10 +190,38 @@ namespace BTLWeb.Areas.Admin.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
+            }*/
+
+            string newFileName = tblPost.PostImg;
+            if (tblPostDto.PostImg != null)
+            {
+                newFileName = DateTime.Now.ToString("yyyyMMddHHmmssff");
+                newFileName += Path.GetExtension(tblPostDto.PostImg!.FileName);
+
+                string imageFullPath = _webHostEnvironment.WebRootPath + "/PostImg/" + newFileName;
+                using (var stream = System.IO.File.Create(imageFullPath))
+                {
+                    tblPostDto.PostImg.CopyTo(stream);
+                }
+
+                string oldImageFullPath = _webHostEnvironment.WebRootPath + "/PostImg/" + tblPost.PostImg;
+                System.IO.File.Delete(oldImageFullPath);
             }
-            ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryId", tblPost.CategoryId);
-            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersId", tblPost.UsersId);
-            return View(tblPost);
+
+            //Update Database
+            tblPost.CategoryId = tblPostDto.CategoryId;
+            tblPost.PostTitle = tblPostDto.PostTitle;
+            tblPost.PostContent = tblPostDto.PostContent;
+            tblPost.PostImg = newFileName;
+            tblPost.PostAuthor = tblPostDto.PostAuthor;
+
+            ViewData["UserId"] = tblPost.UsersId;
+            ViewData["PostImg"] = tblPost.PostImg;
+            ViewData["PostCreateAt"] = tblPost.PostCreateAt.ToString("MM/dd/yyyy");
+            ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryName", tblPost.CategoryId);
+            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPost.UsersId);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index", "Posts");
         }
 
         // GET: Admin/Posts/Delete/5
@@ -173,14 +249,27 @@ namespace BTLWeb.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var tblPost = await _context.TblPosts.FindAsync(id);
+            var tblPost = _context.TblPosts.Find(id);
+            if(tblPost == null)
+            {
+                return RedirectToAction("Index", "Posts");
+            }
+
+            string ImageFullPath = _webHostEnvironment.WebRootPath + "/PostImg/" + tblPost.PostImg;
+            System.IO.File.Delete(ImageFullPath);
+
+            _context.TblPosts.Remove(tblPost);
+            _context.SaveChanges(true);
+
+            return RedirectToAction("Index", "Posts");
+            /*var tblPost = await _context.TblPosts.FindAsync(id);
             if (tblPost != null)
             {
                 _context.TblPosts.Remove(tblPost);
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index));*/
         }
 
         private bool TblPostExists(int id)

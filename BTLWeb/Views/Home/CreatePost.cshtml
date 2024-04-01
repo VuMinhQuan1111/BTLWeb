@@ -1,0 +1,46 @@
+﻿@model BTLWeb.Models.Dto.TblPostDto
+@using Microsoft.AspNetCore.Http
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="container">
+    <h3 class="text-center">Tạo bài viết</h3>
+    <form asp-action="CreatePost" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Tên người dùng</label>
+            <select asp-for="UsersId" class="form-control" asp-items="ViewBag.UsersId"></select>
+        </div>
+        <div class="form-group">
+            <label> Tiêu đề bài viết: </label>
+            <input asp-for="PostTitle" class="form-control" />
+            <span asp-validation-for="PostTitle" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label> Nội dung bài viết: </label>
+            <textarea asp-for="PostContent" class="form-control"></textarea>
+            <span asp-validation-for="PostContent" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label>Danh mục bài viết: </label>
+            <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+        </div>
+        <div class="form-group">
+            <label> Ảnh bài viết: </label>
+            <input asp-for="PostImg" class="form-control" />
+            <span asp-validation-for="PostImg" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label> Tác giả bài viết: </label>
+            <input asp-for="PostAuthor" class="form-control" />
+            <span asp-validation-for="PostAuthor" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Thêm" class="btn btn-primary"></input>
+            <a class="btn btn-outline-primary" asp-area="" asp-controller="Home" asp-action="IndexPost" role="bubtton">Hủy</a>
+        </div>
+        </form>
+    
+</div>

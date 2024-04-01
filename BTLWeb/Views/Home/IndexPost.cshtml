@@ -1,4 +1,4 @@
-﻿@model List<TblPost>
+﻿@model List<BTLWeb.Models.TblPost>
 
 @{
     ViewData["Title"] = "IndexPost";
@@ -19,7 +19,7 @@
                     <div class="col-12">
                         <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
                         <label class="form-check-label" for="flexCheckDefault">
-                        @check.PostTitle
+                        @check.Category.CategoryName
                     </label>
                     </div>
                 </div>
@@ -29,7 +29,7 @@
         
         
             <div style="margin-bottom:10px" class="content col-8">
-            <button style="margin-bottom:10px" type="button" class="btn btn-primary">Tạo bài viết</button>
+            <a asp-area="" asp-controller="Home" asp-action="CreatePost" style="margin-bottom:10px" type="button" class="btn btn-primary">Tạo bài viết</a>
             @foreach (var item in Model)
             {
                 <div style="border:1px solid gray; padding:10px;" class="post-card">
@@ -45,7 +45,7 @@
                         <a asp-action="PostDetail" asp-route-id="@item.PostId"><h3>@item.PostTitle</h3></a>
                     </div>
                     <div class="post-category">
-                        <h4>@item.Category</h4>
+                        <h4>Danh mục - @item.Category.CategoryName</h4>
                     </div>
                     <div class="post-content">
                         <p>@item.PostContent</p>

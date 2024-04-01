@@ -1,5 +1,5 @@
-﻿@model BTLWeb.Models.TblPost
-
+﻿@model BTLWeb.Models.Dto.TblPostDto
+@using Microsoft.AspNetCore.Http
 @{
     ViewData["Title"] = "Create";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
@@ -35,18 +35,18 @@
                 <label asp-for="PostImg" class="control-label"></label>
                 @* <input asp-for="PostImg" class="form-control" /> *@
                 <input type="file" asp-for="PostImg" class="form-control" />
-                <span asp-validation-for="PostImg" class="text-danger"></span>
+                @* <span asp-validation-for="PostImg" class="text-danger"></span> *@
             </div>
             <div class="form-group">
                 <label asp-for="PostAuthor" class="control-label"></label>
                 <input asp-for="PostAuthor" class="form-control" />
                 <span asp-validation-for="PostAuthor" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            @* <div class="form-group">
                 <label asp-for="PostCreateAt" class="control-label"></label>
                 <input asp-for="PostCreateAt" class="form-control" />
                 <span asp-validation-for="PostCreateAt" class="text-danger"></span>
-            </div>
+            </div> *@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

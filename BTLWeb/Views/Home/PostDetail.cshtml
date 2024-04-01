@@ -11,23 +11,23 @@
     <div style="border:1px solid gray; padding:10px;" class="post-card">
         <div class="post-info">
             <div class="post-author">
-                <h3>Được tạo bởi - @Html.DisplayFor(model => model.PostAuthor)</h3>
+                <h3>Được tạo bởi - @Model.PostAuthor</h3>
             </div>
             <div class="post-create-at">
-                <p>Thời gian tạo - @Html.DisplayFor(model => model.PostCreateAt)</p>
+                <p>Thời gian tạo - @Model.PostCreateAt</p>
             </div>
         </div>
         <div class="post-category">
-            <h4>@Html.DisplayFor(model => model.Category)</h4>
+            <h4>@Model.Category.CategoryName</h4>
         </div>
         <div class="post-image">
-            <img src="@Html.DisplayFor(model => model.PostImg)" />
+            <img src="/PostImg/@Model.PostImg"/>
         </div>
         <div class="post-title">
-            <h3>@Html.DisplayFor(model => model.PostTitle)</h3>
+            <h3>@Model.PostTitle</h3>
         </div>
         <div class="post-content">
-            <p>@Html.DisplayFor(model => model.PostContent)</p>
+            <p>@Model.PostContent</p>
         </div>
         <div class="post-interact">
             <div class="post-like">
