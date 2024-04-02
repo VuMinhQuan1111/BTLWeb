@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "IndexPost";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    //var category = (List<BTLWeb.Models.TblCategory>)ViewBag.Category;
 }
 
 <div class="container">
@@ -13,7 +14,14 @@
     <div class="row">
         <div class="sidebar col-4">
             <h3>Bộ lọc</h3>
-            @foreach(var check in Model)
+            <form method="get" class="search-form" asp-area="" asp-action="IndexPost" asp-controller="Home">
+            <div class="form-outline" data-mdb-input-init>
+                <label class="form-label" for="form1">Tìm kiếm</label>
+                <input type="search" name="searchString" placeholder="Tìm kiếm" id="form1" class="form-control" />
+                <button class="btn btn-success" type="submit">Tìm</button>
+            </div>
+            </form>
+            @* @foreach(var check in Model)
             {
                 <div class="row">
                     <div class="col-12">
@@ -23,7 +31,7 @@
                     </label>
                     </div>
                 </div>
-            }
+            } *@
             
         </div>
         

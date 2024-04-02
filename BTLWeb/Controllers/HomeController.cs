@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using BTLWeb.Models.Dto;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using BTLWeb.Models.Authen;
 
 namespace BTLWeb.Controllers
 {
@@ -21,6 +22,7 @@ namespace BTLWeb.Controllers
             _context = context;
         }
 
+        [Authentication]
         public IActionResult Index()
         {
             return View();
@@ -30,14 +32,24 @@ namespace BTLWeb.Controllers
         {
             return View();
         }
-        
 
 
-        public async Task<IActionResult> IndexPost()
+        [Authentication]
+        public async Task<IActionResult> IndexPost(string searchString)
         {
-            var btlwebContext = _context.TblPosts.Include(t => t.Category).Include(t => t.Users).OrderByDescending(p => p.PostId);
             
-            return View(await btlwebContext.ToListAsync());
+            var btlwebContext = _context.TblPosts.Include(t => t.Category).Include(t => t.Users).OrderByDescending(p => p.PostId);
+            if (searchString != null)
+            {
+                return View(await btlwebContext.Where(s => s.PostTitle.Contains(searchString)).ToListAsync());
+            }
+            else
+            {
+                return View(await btlwebContext.ToListAsync());
+                /*return View(await _context.TblPosts.ToListAsync());*/
+            }
+            /*return View(await btlwebContext.ToListAsync());*/
+            /*return View();*/
         }
 
         public async Task<IActionResult> PostDetail(int? id, string searchString)
@@ -51,7 +63,7 @@ namespace BTLWeb.Controllers
                 .Include(t => t.Category)
                 .Include(t => t.Users)
                 .FirstOrDefaultAsync(m => m.PostId == id);
-            /*TblFavorite userfavor = _context.TblFavorites.Where(m => m.UsersId == HttpContext.Session.GetString("username") && m.PostId == id).FirstOrDefault();
+            TblFavorite userfavor = _context.TblFavorites.Where(m => m.Users.UsersName == HttpContext.Session.GetString("username") && m.PostId == id).FirstOrDefault();
             if (userfavor == null)
             {
                 ViewBag.Like = 1;
@@ -59,45 +71,18 @@ namespace BTLWeb.Controllers
             else
             {
                 ViewBag.Like = 2;
-            }*/
+            }
             if (tblPost == null)
             {
                 return NotFound();
             }
 
             return View(tblPost);
-            /*if (id == null)
-            {
-                return NotFound();
-            }
-            if (searchString != null)
-            {
-                return View("IndexSong", await _context.Songs.Where(s => s.Name.Contains(searchString)).ToListAsync());
-            }
-            var song = await _context.Songs
-                .FirstOrDefaultAsync(m => m.Id == id);
-            song.View = song.View + 1;
-            _context.Update(song);
-            await _context.SaveChangesAsync();
-            Favorite userfavor = _context.Favorites.Where(m => m.UserName == HttpContext.Session.GetString("username") && m.Songid == id).FirstOrDefault();
-            if (userfavor == null)
-            {
-                ViewBag.Like = 1;
-            }
-            else
-            {
-                ViewBag.Like = 2;
-            }
-            if (song == null)
-            {
-                return NotFound();
-            }
-
-            ViewBag.Artit = await _context.Artists.Where(m => m.Name == song.Artist).ToListAsync();
-            ViewBag.Similar = await _context.Songs.Where(m => m.Style == song.Style).ToListAsync();*/
+            
             /*return View();*/
         }
 
+        [Authentication]
         public IActionResult CreatePost()
         {
             ViewData["CategoryId"] = new SelectList(db.TblCategories, "CategoryId", "CategoryName");
@@ -106,6 +91,7 @@ namespace BTLWeb.Controllers
         }
 
 
+        
         [HttpPost]
         public async Task<IActionResult> CreatePost([Bind("PostId,UsersId,CategoryId,PostTitle,PostContent,PostImg,PostAuthor,PostCreateAt")] TblPostDto tblPostDto)
         {

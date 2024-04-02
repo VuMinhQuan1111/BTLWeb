@@ -20,8 +20,6 @@
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Admin\Models\" />
-    <Folder Include="Enums\" />
-    <Folder Include="Extensions\" />
     <Folder Include="Models\ModelsView\" />
     <Folder Include="wwwroot\PostImg\" />
   </ItemGroup>

@@ -28,6 +28,7 @@ namespace BTLWeb.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             var btlwebContext = _context.TblPosts.Include(t => t.Category).Include(t => t.Users);
+            /*var category = _context.TblCategories.ToList();*/
             return View(await btlwebContext.ToListAsync());
         }
 

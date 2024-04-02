@@ -1,4 +1,5 @@
 ﻿using BTLWeb.Models;
+using BTLWeb.Models.Authen;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,8 @@ namespace BTLWeb.Controllers
             _logger = logger;
             _context = context;
         }
-        
+
+        [Authentication]
         public async Task<IActionResult> Index()
         {
             if (HttpContext.Session.GetString("UsersName") == null)
@@ -32,6 +34,7 @@ namespace BTLWeb.Controllers
             }
         }
 
+        
         [HttpGet]
         public IActionResult Login()
         {
@@ -72,6 +75,7 @@ namespace BTLWeb.Controllers
             return View(tblUser);
         }
 
+        
         [HttpGet]
         public IActionResult Register()
         {
@@ -143,7 +147,37 @@ namespace BTLWeb.Controllers
             /*return Redirect(Request.Headers["Referer"].ToString());*/
         }
 
-        
+        [HttpPost]
+        public IActionResult PostComment()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Favorite(int postId, TblFavorite tblFavorite)
+        {
+            var usersName = HttpContext.Session.GetString("UsersName");
+            TblFavorite userLiked = _context.TblFavorites.FirstOrDefault(m => m.Users.UsersName.ToString() == usersName && m.PostId == postId);
+            if(userLiked == null)
+            {
+                tblFavorite.Users.UsersName = HttpContext.Session.GetString("UsersName").ToString();
+                tblFavorite.PostId = postId;
+                _context.TblFavorites.Add(tblFavorite);
+                await _context.SaveChangesAsync();
+                return Json(new { isLiked = true});
+
+            }
+            else
+            {
+                _context.TblFavorites.Remove(tblFavorite);
+                await _context.SaveChangesAsync();
+                return Json(new { isLiked = false });
+
+            }
+            return Json(new { isLiked = false });
+            /*return Redirect(Request.Headers["Referer"].ToString());*/
+        }
+
 
         // GET: AccountController/Details/5
         public ActionResult Details(int id)

@@ -29,14 +29,42 @@
         <div class="post-content">
             <p>@Model.PostContent</p>
         </div>
-        <div class="post-interact">
-            <div class="post-like">
-                <h3>Like</h3>
+    </div>
+    <div class="post-interact">
+        @if (ViewBag.Like == 1)
+        {
+            <div class="col-lg-4">
+                <div class="posts-links">
+                    <a href="@Url.Action("Favorite", "Account")?postid=@Html.DisplayFor(model => model.PostId)"><img class="like-icon" src="~/image/LikeIconBlack.jpg" alt=""></a>
+                    
+                </div>
             </div>
-            <div class="post-comment">
-                <label>Để lại bình luận</label>
-                <textarea class="form-control"></textarea>
+        }
+        else
+        {
+            <div class="col-lg-4">
+                <div class="posts-links">
+                    <a href="@Url.Action("Favorite", "Account")?postid=@Html.DisplayFor(model => model.PostId)"><img class="like-icon" src="~/image/LikeIconBlue.jpg" alt=""></a>
+                    
+                </div>
             </div>
+        }
+        <form>
+        <div id="commentForm">
+            <label>Để lại bình luận</label>
+            <textarea class="form-control"></textarea>
+            <button class="btn btn-success" id="btnComment" type="button">Gửi bình luận</button>
         </div>
+        </form>
     </div>
 </div>
+
+        @* <script>
+            $("#btnComment").click(function(){
+                $.ajax({
+                    type:'post',
+                    url:'',
+                    data: $('$commentForm').serialize()
+                })
+            })
+        </script> *@
