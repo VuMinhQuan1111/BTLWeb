@@ -3,15 +3,18 @@
 @{
     ViewData["Title"] = "PostDetail";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var Post = (List<BTLWeb.Models.TblPost>)ViewBag.Post;
-    var Comment = (List<BTLWeb.Models.TblComment>)ViewBag.Comment;
+    //var Post = (List<BTLWeb.Models.TblPost>)ViewBag.Post;
+    //var Comment = (List<BTLWeb.Models.TblComment>)ViewBag.Comment;
+    TblPost? post = ViewData["TblPost"] as TblPost;
 }
+@using Microsoft.AspNetCore.Http
+
 
 <div class="container">
     <div style="border:1px solid gray; padding:10px;" class="post-card">
         <div class="post-info">
             <div class="post-author">
-                <h3>Được tạo bởi - @Model.PostAuthor</h3>
+                <h3>Được tạo bởi - @Model.Users.UsersName</h3>
             </div>
             <div class="post-create-at">
                 <p>Thời gian tạo - @Model.PostCreateAt</p>
@@ -29,35 +32,99 @@
         <div class="post-content">
             <p>@Model.PostContent</p>
         </div>
+        
     </div>
-    <div class="post-interact">
-        @if (ViewBag.Like == 1)
+    
+        <h6>Lượt thích: <span id="favCount">@ViewBag.FavCount</span></h6>
+    
+        @if(@Context.Session.GetInt32("UsersId") != null)
         {
-            <div class="col-lg-4">
-                <div class="posts-links">
-                    <a href="@Url.Action("Favorite", "Account")?postid=@Html.DisplayFor(model => model.PostId)"><img class="like-icon" src="~/image/LikeIconBlack.jpg" alt=""></a>
-                    
-                </div>
+            <div id="FavButton">
+            @if (ViewBag.Fav == 1)
+            {
+            <i class="bi bi-heart" onclick="toggleFav('@Html.DisplayFor(model => model.PostId)')"></i>
+            }
+            else
+            {
+            <i class="bi bi-heart-fill" onclick="toggleFav('@Html.DisplayFor(model => model.PostId)')"></i>
+            }
             </div>
         }
-        else
-        {
-            <div class="col-lg-4">
-                <div class="posts-links">
-                    <a href="@Url.Action("Favorite", "Account")?postid=@Html.DisplayFor(model => model.PostId)"><img class="like-icon" src="~/image/LikeIconBlue.jpg" alt=""></a>
-                    
+        
+    <div class="post-comment">
+        <div class="" id="comments">
+            @foreach (var item in post?.TblComments ?? new List<TblComment>())
+            {
+                <div class="">
+                    <h3>@item.Users?.UsersName</h3>
+                    <p>@item.CommentText</p>
+                    <p>@item.CreateAt</p>
                 </div>
-            </div>
-        }
-        <form>
-        <div id="commentForm">
-            <label>Để lại bình luận</label>
-            <textarea class="form-control"></textarea>
-            <button class="btn btn-success" id="btnComment" type="button">Gửi bình luận</button>
+            }
         </div>
-        </form>
+        @if (@Context.Session.GetInt32("UsersId") != null)
+        {
+            <div class="d-flex flex-column gap-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4>Để lại bình luận</h4>
+                <button class="btn btn-primary" onclick="AddComments()">Gửi</button>
+            </div>
+            <textarea class="form-control" rows="3" id="comments-content"></textarea>
+        </div>            
+        }
+
     </div>
 </div>
+<script>
+    function AddComments(){
+        var id = @post?.PostId;
+        var comments = document.getElementById("comments-content").value;
+        fetch('/Home/AddComments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                id: id,
+                comments: comments
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success)
+                    location.reload();
+            });
+    }
+
+    function toggleFav(postId){
+        $.ajax({
+            url: '/Account/Favorite?postId=' + postId,
+            type: 'POST',
+            success: function (data){
+                if(data.isFav){
+                    $('#FavButton').html('<i class="bi bi-heart-fill" onclick="toggleFav(\'' + postId + '\')"></i>');
+                }else{
+                    $('#FavButton').html('<i class="bi bi-heart" onclick="toggleFav(\'' + postId + '\')"></i>');
+                }
+                updateFavCount(postId);
+            }
+        });
+    }
+
+    function updateFavCount(postId){
+        $.ajax({
+            url: '/Account/GetFavCount?id=' + postId,
+            type: 'GET',
+            success: function (data) {
+                $('#favCount').text(data.favCount);
+            }
+        });
+    }
+
+     
+</script>
+
 
         @* <script>
             $("#btnComment").click(function(){

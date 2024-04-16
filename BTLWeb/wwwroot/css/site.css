@@ -18,7 +18,10 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    background-image: url('/FoodImg/Foodbackground.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin-bottom: 60px;
 }
 
 .post-image img{

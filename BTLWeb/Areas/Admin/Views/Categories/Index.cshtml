@@ -5,21 +5,21 @@
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<h1>Index</h1>
+<h1>Danh sách danh mục đồ ăn</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Tạo danh mục mới</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.CategoryName)
+                Tên danh mục
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CategoryDescription)
+                Nội dung danh mục
             </th>
-            <th></th>
+            <th>Xử lý</th>
         </tr>
     </thead>
     <tbody>
@@ -32,9 +32,9 @@
                 @Html.DisplayFor(modelItem => item.CategoryDescription)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.CategoryId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CategoryId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.CategoryId">Sửa</a> |
+                <a asp-action="Details" asp-route-id="@item.CategoryId">Chi tiết</a> |
+                <a asp-action="Delete" asp-route-id="@item.CategoryId">Xóa</a>
             </td>
         </tr>
 }

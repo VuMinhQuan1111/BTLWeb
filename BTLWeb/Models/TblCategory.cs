@@ -11,5 +11,7 @@ public partial class TblCategory
 
     public string? CategoryDescription { get; set; }
 
+    public virtual ICollection<TblFood> TblFoods { get; set; } = new List<TblFood>();
+
     public virtual ICollection<TblPost> TblPosts { get; set; } = new List<TblPost>();
 }

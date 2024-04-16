@@ -1,8 +1,11 @@
 ﻿using BTLWeb.Models;
 using BTLWeb.Models.Authen;
+using BTLWeb.Models.ModelsView;
+using BTLWeb.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using X.PagedList;
 
 namespace BTLWeb.Controllers
 {
@@ -20,17 +23,22 @@ namespace BTLWeb.Controllers
         }
 
         [Authentication]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            if (HttpContext.Session.GetString("UsersName") == null)
+            
+            if (HttpContext.Session.GetInt32("UsersId") == null)
             {
                 return View("Login");
             }
             else
             {
-                ViewBag.userinfor = await _context.TblUsers.Where(m => m.UsersName == HttpContext.Session.GetString("UsersName")).ToListAsync();
-                /*ViewBag.Soyt = _context.Favorites.Where(m => m.UserName == HttpContext.Session.GetString("username")).Count();*/
-                return View();
+                TblUser? userinfor = _context.TblUsers
+                    .Where(m => m.UsersId == HttpContext.Session.GetInt32("UsersId"))
+                    .Include(u => u.TblFavorites).ThenInclude(f => f.Post)
+                    .FirstOrDefault();
+                if (userinfor == null) return RedirectToAction("Index", "Home");
+                ViewBag.Soyt = _context.TblFavorites.Where(m => m.UsersId == HttpContext.Session.GetInt32("UsersId")).Count();
+                return View(userinfor);
             }
         }
 
@@ -38,21 +46,40 @@ namespace BTLWeb.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            if(HttpContext.Session.GetString("UsersName") == null) {
+            if (AuthService.IsAuthenticated(HttpContext))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            return View();
+            /*if(HttpContext.Session.GetString("UsersName") == null) {
                 return View();
             }
             else
             {
                 return RedirectToAction("Index", "Home");
-            }
+            }*/
             
         }
 
         [HttpPost]
-        public IActionResult Login(TblUser tblUser)
+        /*public IActionResult Login(TblUser tblUser)*/
+        public IActionResult Login(MV_SignIn data)
         {
-            
-            System.Diagnostics.Debug.WriteLine(tblUser.UsersEmail);
+            if (ModelState.IsValid)
+            {
+                if(AuthService.CreateSession(HttpContext, data))
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    ModelState.AddModelError("UsersName", "Tên tài khoản hoặc mật khẩu chưa đúng");
+                }
+                return View();
+            }
+            return View();
+
+            /*System.Diagnostics.Debug.WriteLine(tblUser.UsersEmail);
             if (HttpContext.Session.GetString("UsersName") == null)
             {
                 var u = db.TblUsers.Where(x => x.UsersName.Equals(tblUser.UsersName) && x.UsersPass.Equals(tblUser.UsersPass)).FirstOrDefault();
@@ -63,7 +90,7 @@ namespace BTLWeb.Controllers
                 else if (u != null)
                 {
                     HttpContext.Session.SetString("UsersName", u.UsersName.ToString());
-                    System.Diagnostics.Debug.WriteLine(HttpContext.Session.GetString("UsersName"));
+                    //System.Diagnostics.Debug.WriteLine(HttpContext.Session.GetString("UsersName"));
                     return RedirectToAction("Index", "Home");
                 }
                 else
@@ -72,7 +99,7 @@ namespace BTLWeb.Controllers
                 }
             }
             System.Diagnostics.Debug.WriteLine("Hello there");
-            return View(tblUser);
+            return View(tblUser);*/
         }
 
         
@@ -83,7 +110,18 @@ namespace BTLWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register([Bind("UsersId, UsersName, UsersEmail, UsersPass, UsersRole")] TblUser tblUser)
+        public IActionResult Register(MV_Register data)
+        {
+            if (ModelState.IsValid)
+            {
+                if (AuthService.CreateUser(data))
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+            }
+            return View();
+        }
+        /*public async Task<IActionResult> Register([Bind("UsersId, UsersName, UsersEmail, UsersPass, UsersRole")] TblUser tblUser)
         {
             var user = new TblUser
             {
@@ -96,7 +134,8 @@ namespace BTLWeb.Controllers
 
             if (ModelState.IsValid)
             {
-                if (_context.TblUsers.Any(x=>x.UsersName == tblUser.UsersName)){
+                if (_context.TblUsers.Any(x => x.UsersName == tblUser.UsersName))
+                {
                     ViewBag.alert = "Tên đã được sử dụng";
                 }
                 else if (_context.TblUsers.Any(x => x.UsersEmail == tblUser.UsersEmail))
@@ -111,7 +150,8 @@ namespace BTLWeb.Controllers
 
                 }
             }
-                return View();
+            return View();
+        }*/
             /*string username = fielt["username"];
             string pass = fielt["pass"];
             string email = fielt["email"];
@@ -136,51 +176,106 @@ namespace BTLWeb.Controllers
                 ViewBag.ancap = "Đăng ký tài khoản thành công";
             }
             return View();*/
-        }
+        
 
         [HttpGet]
         public IActionResult LogOut()
         {
-            HttpContext.Session.Clear();
-            HttpContext.Session.Remove("UsersName");
+            /*HttpContext.Session.Clear();
+            HttpContext.Session.Remove("UsersId");*/
+            AuthService.Logout(HttpContext);
             return RedirectToAction("Login", "Account");
             /*return Redirect(Request.Headers["Referer"].ToString());*/
         }
 
+
         [HttpPost]
-        public IActionResult PostComment()
+        public IActionResult Favorite(int postId)
         {
-            return View();
+            //var usersId = HttpContext.Session.GetInt32("UsersId");
+            //if(usersId == null)
+            //{
+            //    return View("Login", "Account");
+            //}
+            //else
+            var usersId = HttpContext.Session.GetInt32("UsersId"); // sao k lấy id ở đây luôn đi wtf
+            if (ModelState.IsValid) 
+            { 
+                TblFavorite userFav = _context.TblFavorites.FirstOrDefault(m => m.UsersId == usersId && m.PostId == postId);
+                if (userFav == null)
+                {
+                    TblFavorite tblFavorite = new TblFavorite
+                    {
+                        UsersId = (int)usersId, // lỗi đây này, 
+                        PostId = postId
+                    };
+                    _context.TblFavorites.Add(tblFavorite);
+                    _context.SaveChanges();
+                    return Json(new { isFav = true });
+
+                }
+                else
+                {
+                    _context.TblFavorites.Remove(userFav);
+                    _context.SaveChanges();
+                    return Json(new { isFav = false });
+
+                }
+            }
+            //return Json(new { isLiked = false });
+            return Json(new { isFav = false });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Favorite(int postId, TblFavorite tblFavorite)
+        [HttpGet]
+        public IActionResult GetFavCount(int id)
         {
-            var usersName = HttpContext.Session.GetString("UsersName");
-            TblFavorite userLiked = _context.TblFavorites.FirstOrDefault(m => m.Users.UsersName.ToString() == usersName && m.PostId == postId);
-            if(userLiked == null)
-            {
-                tblFavorite.Users.UsersName = HttpContext.Session.GetString("UsersName").ToString();
-                tblFavorite.PostId = postId;
-                _context.TblFavorites.Add(tblFavorite);
-                await _context.SaveChangesAsync();
-                return Json(new { isLiked = true});
+            int favCount = _context.TblFavorites.Where(m => m.PostId == id).Count();
+                return Json(new { favCount = favCount });
+        }
 
+        public IActionResult LikePostList()
+        {
+            
+            if (HttpContext.Session.GetInt32("UsersId") == null)
+            {
+                return View("Login");
             }
             else
             {
-                _context.TblFavorites.Remove(tblFavorite);
-                await _context.SaveChangesAsync();
-                return Json(new { isLiked = false });
+                var posts = (from p in _context.TblPosts.Include(t => t.Category).Include(t => t.Users)
+                             join o in _context.TblFavorites
+                             on p.PostId equals o.PostId
+                             where o.UsersId == HttpContext.Session.GetInt32("UsersId")
+                             select p).ToPagedList();
 
+                return View(posts);
             }
-            return Json(new { isLiked = false });
-            /*return Redirect(Request.Headers["Referer"].ToString());*/
         }
 
+        public IActionResult ChangePassword()
+        {
+            if (HttpContext.Session.GetInt32("UsersId") == null)
+            {
+                return View("Login");
+            }
+            else
+            {
+                return View();
+            }
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(MV_Changepass changepass)
+        {
+            var userinfo = _context.TblUsers.Where(m => m.UsersId == HttpContext.Session.GetInt32("UsersId")).FirstOrDefault();
+            if (ModelState.IsValid)
+            {
+
+            }
+            return View(changepass);
+        }
         // GET: AccountController/Details/5
-        public ActionResult Details(int id)
+        /*public ActionResult Details(int id)
         {
             return View();
         }
@@ -246,6 +341,6 @@ namespace BTLWeb.Controllers
             {
                 return View();
             }
-        }
+        }*/
     }
 }

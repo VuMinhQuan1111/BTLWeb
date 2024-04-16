@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BTLWeb.Models;
+using BTLWeb.Models.ModelsView;
+using BTLWeb.Models.Dto;
 
 namespace BTLWeb.Areas.Admin.Controllers
 {
@@ -54,15 +56,22 @@ namespace BTLWeb.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,CategoryName,CategoryDescription")] TblCategory tblCategory)
+        public async Task<IActionResult> Create([Bind("CategoryName,CategoryDescription")] MV_Categories mv_categories)
         {
             if (ModelState.IsValid)
             {
+                TblCategory tblCategory = new TblCategory()
+                {
+                    
+                    CategoryName = mv_categories.CategoryName,
+                    CategoryDescription = mv_categories.CategoryDescription,
+                    
+                };
                 _context.Add(tblCategory);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(tblCategory);
+            return View(mv_categories);
         }
 
         // GET: Admin/Categories/Edit/5

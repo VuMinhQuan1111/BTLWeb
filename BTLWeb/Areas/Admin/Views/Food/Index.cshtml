@@ -1,0 +1,63 @@
+﻿@model IEnumerable<BTLWeb.Models.TblFood>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>Danh sách đồ ăn</h1>
+
+<p>
+    <a asp-action="Create">Tạo đồ ăn</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Danh mục
+            </th>
+            <th>
+                @* @Html.DisplayNameFor(model => model.PostTitle) *@
+                Tên đồ ăn
+            </th>
+            <th>
+                @* @Html.DisplayNameFor(model => model.PostContent) *@
+                Nội dung đồ ăn
+            </th>
+            <th>
+                @* @Html.DisplayNameFor(model => model.PostImg) *@
+                Ảnh đồ ăn
+            </th>
+           
+            <th>
+                Xử lý
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FoodName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FoodDescription)
+                </td>
+                <td>
+                    <img src="/PostImg/@item.FoodImg" alt="Post Image" width="100" height="100">
+                </td>
+                
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.FoodId">Sửa</a> |
+                    <a asp-action="Details" asp-route-id="@item.FoodId">Chi tiết</a> |
+                    <a asp-action="Delete" asp-route-id="@item.FoodId">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

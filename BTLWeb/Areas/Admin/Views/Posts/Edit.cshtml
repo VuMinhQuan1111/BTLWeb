@@ -14,11 +14,11 @@
         <form method="post" asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             @* <input type="hidden" asp-for="PostId" /> *@
-            <div class="form-group">
+            @*<div class="form-group">
                 <label asp-for="UsersId" class="control-label"></label>
                 <input readonly class="form-control-plaintext" value="@ViewData["UserId"]"></input>
                
-            </div>
+            </div>*@
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label"></label>
                 <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
@@ -40,14 +40,14 @@
                 <span asp-validation-for="PostImg" class="text-danger"></span>
             </div>
             <div class="image">
-                <img src="/PostImg/@ViewData["PostImg"] width="150" height="150" />
+                <img src="/PostImg/@ViewData["PostImg"]" width="150" height="150"/>
                
             </div>
-            <div class="form-group">
+            @*<div class="form-group">
                 <label asp-for="PostAuthor" class="control-label"></label>
                 <input asp-for="PostAuthor" class="form-control" />
                 <span asp-validation-for="PostAuthor" class="text-danger"></span>
-            </div>
+            </div>*@
             @* <div class="form-group">
                 <label asp-for="PostCreateAt" class="control-label"></label>
                 <input asp-for="PostCreateAt" class="form-control" />

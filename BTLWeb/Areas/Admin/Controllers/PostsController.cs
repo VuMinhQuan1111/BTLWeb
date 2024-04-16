@@ -65,42 +65,52 @@ namespace BTLWeb.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PostId,UsersId,CategoryId,PostTitle,PostContent,PostImg,PostAuthor,PostCreateAt")] TblPostDto tblPostDto, IFormFile imageFile)
+        public async Task<IActionResult> Create([Bind("UsersId,CategoryId,PostTitle,PostContent,PostImg")] TblPostDto tblPostDto)    
         {
             try
             {
-                /*if (imageFile != null)
+                
+                
+                if (HttpContext.Session.GetInt32("UsersId") == null)
                 {
-                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "PostImg");
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                    await imageFile.CopyToAsync(new FileStream(filePath, FileMode.Create));
-                    tblPost.PostImg = "/PostImg/" + uniqueFileName;
-                }*/
-                string newFileName = DateTime.Now.ToString("yyyyMMddHHmmssff");
-                newFileName += Path.GetExtension(tblPostDto.PostImg!.FileName);
-
-                string imageFullPath = _webHostEnvironment.WebRootPath + "/PostImg/" + newFileName;
-                using (var stream = System.IO.File.Create(imageFullPath)){
-                    tblPostDto.PostImg.CopyTo(stream);
+                    return View("Login");
                 }
-                    /*if (ModelState.IsValid)
-                    {*/
+                else {
+                    if (tblPostDto.PostImg == null)
+                    {
+                        ModelState.AddModelError("PostImg", "Hãy thêm ảnh bài viết");
+                    }
+                    if (!ModelState.IsValid)
+                    {
+                        ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryName", tblPostDto.CategoryId);
+                        return View(tblPostDto);
+                    }
+                    string newFileName = DateTime.Now.ToString("yyyyMMddHHmmssff");
+                    newFileName += Path.GetExtension(tblPostDto.PostImg!.FileName);
+
+                    string imageFullPath = _webHostEnvironment.WebRootPath + "/PostImg/" + newFileName;
+                    using (var stream = System.IO.File.Create(imageFullPath)){
+                        tblPostDto.PostImg.CopyTo(stream);
+                    }
+                    //if (ModelState.IsValid)
+                    //{
 
                     TblPost tblPost = new TblPost()
                     {
-                        UsersId = tblPostDto.UsersId,
+                        UsersId = HttpContext.Session.GetInt32("UsersId") ?? 0,
                         CategoryId = tblPostDto.CategoryId,
                         PostTitle = tblPostDto.PostTitle,
                         PostContent = tblPostDto.PostContent,
                         PostImg = newFileName,
-                        PostAuthor = tblPostDto.PostAuthor,
+                        //PostAuthor = tblPostDto.PostAuthor,
                         PostCreateAt = DateTime.Now
                     };
-                _context.Add(tblPost);
+                    ViewData["UsersId"] = HttpContext.Session.GetInt32("UsersId") ?? 0;
+                    _context.Add(tblPost);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
-                /*}*/
+                    //}
+                }
             }
             catch (DbUpdateException ex)
             {
@@ -110,7 +120,7 @@ namespace BTLWeb.Areas.Admin.Controllers
             }
             
             ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryName", tblPostDto.CategoryId);
-            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPostDto.UsersId);
+            //ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPostDto.UsersId);
             return View(tblPostDto);
         }
 
@@ -133,16 +143,16 @@ namespace BTLWeb.Areas.Admin.Controllers
                 
                 PostTitle = tblPost.PostTitle,
                 PostContent = tblPost.PostContent,
-                PostAuthor = tblPost.PostAuthor,
+                //PostAuthor = tblPost.PostAuthor,
                 
             };
 
-            ViewData["UserId"] = tblPost.UsersId;
+            //ViewData["UserId"] = tblPost.UsersId;
             ViewData["PostImg"] = tblPost.PostImg;
             ViewData["PostCreateAt"] = tblPost.PostCreateAt.ToString("MM/dd/yyyy");
 
             ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryName", tblPostDto.CategoryId);
-            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPostDto.UsersId);
+            //ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPostDto.UsersId);
             return View(tblPostDto);
         }
 
@@ -151,7 +161,7 @@ namespace BTLWeb.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PostId,UsersId,CategoryId,PostTitle,PostContent,PostImg,PostAuthor,PostCreateAt")] TblPostDto tblPostDto)
+        public async Task<IActionResult> Edit(int id, [Bind("UsersId,CategoryId,PostTitle,PostContent,PostImg")] TblPostDto tblPostDto)
         {
             var tblPost = _context.TblPosts.Find(id);
             if( tblPost == null)
@@ -214,13 +224,13 @@ namespace BTLWeb.Areas.Admin.Controllers
             tblPost.PostTitle = tblPostDto.PostTitle;
             tblPost.PostContent = tblPostDto.PostContent;
             tblPost.PostImg = newFileName;
-            tblPost.PostAuthor = tblPostDto.PostAuthor;
+            //tblPost.PostAuthor = tblPostDto.PostAuthor;
 
             ViewData["UserId"] = tblPost.UsersId;
             ViewData["PostImg"] = tblPost.PostImg;
             ViewData["PostCreateAt"] = tblPost.PostCreateAt.ToString("MM/dd/yyyy");
             ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryName", tblPost.CategoryId);
-            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPost.UsersId);
+            //ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPost.UsersId);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", "Posts");
         }

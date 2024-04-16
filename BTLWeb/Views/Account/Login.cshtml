@@ -1,4 +1,4 @@
-﻿@model BTLWeb.Models.TblUser
+﻿@model BTLWeb.Models.ModelsView.MV_SignIn
 @{
     ViewData["Title"] = "Login";
     Layout = "~/Views/Shared/_Layout-Blank.cshtml";
@@ -12,8 +12,12 @@
                 <div class="col-md-8 col-lg-6 col-xxl-3">
                     <div class="card mb-0">
                         <div class="card-body">
+                            
+                            
                             <a href="#" class="text-nowrap logo-img text-center d-block py-3 w-100">
-                                <img src="../AdminAssets/images/logos/dark-logo.svg" width="180" alt="">
+                                @* <img src="../AdminAssets/images/logos/dark-logo.svg" width="180" alt=""> *@
+                                <img src="/image/logo-webfood.jpg" width="180" />
+                                
                             </a>
                             <p class="text-center">Mạng xã hội Review về Ẩm thực</p>
                             <p style="color: red">@ViewBag.alert</p>
@@ -22,12 +26,12 @@
                                
                                 <div class="form-group mb-3">
                                     
-                                    <label for="exampleInputName" class="form-label">Username</label>
+                                    <label for="exampleInputName" class="form-label">Tên người dùng</label>
                                     <input  type="text" name="UsersName" class="form-control" id="exampleInputName" aria-describedby="nameHelp">
                                     <span asp-validation-for="UsersName" class="text-danger"></span>
                                 </div>
                                 <div class="form-group mb-4">
-                                    <label for="exampleInputPassword1" class="form-label">Password</label>
+                                    <label for="exampleInputPassword1" class="form-label">Mật khẩu</label>
                                     <input type="password" name="UsersPass" class="form-control" id="exampleInputPassword1">
                                     <span asp-validation-for="UsersPass" class="text-danger"></span>
                                     
@@ -36,10 +40,10 @@
                                     <div class="form-check">
                                         <input class="form-check-input primary" type="checkbox" value="" id="flexCheckChecked" checked>
                                         <label class="form-check-label text-dark" for="flexCheckChecked">
-                                            Remeber this Device
+                                            Nhớ mật khẩu
                                         </label>
                                     </div>
-                                    <a class="text-primary fw-bold" href="#">Forgot Password ?</a>
+                                    @* <a class="text-primary fw-bold" href="#">Quên mật khẩu ?</a> *@
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-primary rounded submit p-3 px-5">Đăng Nhập</button>
@@ -47,7 +51,7 @@
                                 @* <a class="btn btn-primary w-100 fs-4 mb-4 rounded-2">Sign In</a> *@
                                 <div class="d-flex align-items-center justify-content-center">
                            
-                                    <a class="text-primary fw-bold ms-2" asp-controller="Account" asp-action="Register">Create an account</a>
+                                    <a class="text-primary fw-bold ms-2" asp-controller="Account" asp-action="Register">Đăng ký</a>
                                 </div>
                             </form>
                         </div>

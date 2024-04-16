@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "LikePostList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var category = (List<BTLWeb.Models.TblCategory>)ViewBag.Category;
+}
+@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<BTLWeb.Models.TblPost>
+<div class="container">
+    <div class="text-center" style="background-image: url('/BannerImage/food-banner.jpg'); background-repeat: no-repeat; background-size: cover; padding:30px;">
+        <h1 style="color:white" class="display-4">Bài viết đã thích</h1>
+
+    </div>
+    <div class="row">
+        @* <div class="sidebar col-4">
+            <h3>Bộ lọc</h3>
+            <form method="get" class="search-form" asp-area="" asp-action="IndexPost" asp-controller="Home">
+                <div class="form-outline" data-mdb-input-init>
+                    <label class="form-label" for="form1">Tìm kiếm</label>
+                    <input type="search" name="searchString" placeholder="Tìm kiếm" id="form1" class="form-control" />
+                    <button class="btn btn-success" type="submit">Tìm</button>
+                </div>
+                <div class="">
+                    <a asp-area="" asp-action="IndexPost" asp-controller="Home">Hủy tìm kiếm</a>
+                </div>
+            </form>
+
+           
+
+        </div> *@
+
+
+        <div style="margin-bottom:10px" class="content col-12">
+            @foreach (var item in Model)
+            {
+                <div style="border:1px solid gray; padding:10px;" class="post-card">
+                    <div class="post-info">
+                        <div class="post-author">
+                            <h3>Được tạo bởi - @item.Users.UsersName</h3>
+                        </div>
+                        <div class="post-create-at">
+                            <p>Thời gian tạo - @item.PostCreateAt</p>
+                        </div>
+                    </div>
+                    <div class="post-title">
+                        <a asp-action="PostDetail" asp-controller="Home" asp-route-id="@item.PostId"><h3>@item.PostTitle</h3></a>
+                    </div>
+                    <div class="post-category">
+                        <h4>Danh mục - @item.Category.CategoryName</h4>
+                    </div>
+                    <div class="post-content">
+                        <p>@item.PostContent</p>
+                    </div>
+                    <div class="post-image">
+                        <a asp-action="PostDetail" asp-controller="Home" asp-route-id="@item.PostId"><img src="/PostImg/@item.PostImg" /></a>
+                    </div>
+                </div>
+            }
+        </div>
+
+
+    </div>
+</div>
+@Html.PagedListPager(Model, page => Url.Action("IndexPost", new { page = page }))

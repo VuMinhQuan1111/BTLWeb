@@ -7,7 +7,7 @@ namespace BTLWeb.Models.Authen
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if(context.HttpContext.Session.GetString("UsersName") == null)
+            if(context.HttpContext.Session.GetInt32("UsersId") == null)
             {
                 context.Result = new RedirectToRouteResult(
                     new RouteValueDictionary

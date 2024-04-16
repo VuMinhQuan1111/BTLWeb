@@ -20,7 +20,7 @@
                 <div class="d-flex mb-4 align-items-center justify-content-between">
                     <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="text-nowrap logo-img ms-0 ms-md-1">
                         @* <img src="~/adminassets/images/logos/dark-logo.svg" width="180" alt=""> *@
-                        <h2>BIG FOOD</h2>
+                        <img src="/image/logo-webfood.jpg" width="120" height="120" />
                     </a>
                     <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
                         <i class="ti ti-x fs-8"></i>
@@ -77,16 +77,16 @@
                                 <span class="hide-menu ms-2 ps-1">Danh sách bài viết</span>
                             </a>
                         </li>
-                        <li class="sidebar-item">
+                        @* <li class="sidebar-item">
                             <a class="sidebar-link sidebar-link primary-hover-bg"
-                               href="./ui-forms.html"
+                               asp-area="Admin" asp-controller="Food" asp-action="Index"
                                aria-expanded="false">
                                 <span class="aside-icon p-2 bg-light-primary rounded-3">
                                     <i class="ti ti-file-description fs-7 text-primary"></i>
                                 </span>
                                 <span class="hide-menu ms-2 ps-1">Hệ thống</span>
                             </a>
-                        </li>
+                        </li> *@
                         <li class="sidebar-item">
                             <a class="sidebar-link sidebar-link indigo-hover-bg"
                                asp-area="Admin" asp-controller="Users" asp-action="Index"
@@ -103,15 +103,15 @@
                         </li>
                         <li class="sidebar-item">
                             <a class="sidebar-link sidebar-link warning-hover-bg"
-                               asp-area="" asp-controller="Account" asp-action="Login"
+                               asp-area="" asp-controller="Home" asp-action="Index"
                                aria-expanded="false">
                                 <span class="aside-icon p-2 bg-light-warning rounded-3">
                                     <i class="ti ti-login fs-7 text-warning"></i>
                                 </span>
-                                <span class="hide-menu ms-2 ps-1">Đăng nhập</span>
+                                <span class="hide-menu ms-2 ps-1">Trở về trang khách</span>
                             </a>
                         </li>
-                        <li class="sidebar-item">
+                        @* <li class="sidebar-item">
                             <a class="sidebar-link sidebar-link danger-hover-bg"
                                asp-area="" asp-controller="Account" asp-action="Register"
                                aria-expanded="false">
@@ -120,7 +120,7 @@
                                 </span>
                                 <span class="hide-menu ms-2 ps-1">Đăng ký</span>
                             </a>
-                        </li>
+                        </li> *@
                        @*  <li class="nav-small-cap">
                             <i class="ti ti-dots nav-small-cap-icon fs-5"></i>
                             <span class="hide-menu">Extra</span>

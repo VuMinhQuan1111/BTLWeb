@@ -1,11 +1,12 @@
-﻿@model List<BTLWeb.Models.TblPost>
+﻿
 
 @{
     ViewData["Title"] = "IndexPost";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    //var category = (List<BTLWeb.Models.TblCategory>)ViewBag.Category;
+    var category = (List<BTLWeb.Models.TblCategory>)ViewBag.Category;
 }
-
+@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<BTLWeb.Models.TblPost>
 <div class="container">
     <div class="text-center" style="background-image: url('/BannerImage/food-banner.jpg'); background-repeat: no-repeat; background-size: cover; padding:30px;">
         <h1 style="color:white" class="display-4">Bài viết chia sẻ về Ẩm thực</h1>
@@ -20,18 +21,60 @@
                 <input type="search" name="searchString" placeholder="Tìm kiếm" id="form1" class="form-control" />
                 <button class="btn btn-success" type="submit">Tìm</button>
             </div>
+            <div class="">
+               <a asp-area="" asp-action="IndexPost" asp-controller="Home">Hủy tìm kiếm</a>
+            </div>
             </form>
-            @* @foreach(var check in Model)
+
+            @* <form method="get" class="search-form" asp-area="" asp-action="IndexPost" asp-controller="Home">
+                <div class="form-outline" data-mdb-input-init>
+                    <label class="form-label" for="form1">Tìm kiếm theo danh mục</label>
+                    <input type="search" name="searchByCategory" placeholder="Tìm kiếm" id="form1" class="form-control" />
+                    <button class="btn btn-success" type="submit">Tìm</button>
+                </div>
+                <div class="">
+                    <a asp-area="" asp-action="IndexPost" asp-controller="Home">Hủy tìm kiếm</a>
+                </div>
+            </form> *@
+
+            <h3>Sắp xếp</h3>
+            <form asp-action="IndexPost">
+            <select class="form-control" onchange="forms[0].submit()">
+                <option value="0">---Sắp Xếp---</option>
+                <option name="alphabet" value="2">Từ A-Z</option>
+                <option name="alphabet2" value="3">Từ Z-A</option>
+                <option name="ascending" value="4">Mới nhất</option>
+                <option name="descending" value="5">Cũ nhất</option>
+            </select>
+            </form>
+            <h3>Lọc theo danh mục</h3>
+            <div class="container">
+                <div class="category-links">
+                    <a href="/Home/IndexPost?cate=" class="active">Tất cả</a>
+                    <a href="/Home/IndexPost?cate=Pizza">Pizza</a>
+                    <a href="/Home/IndexPost?cate=Burger">Burger</a>
+                    <a href="/Home/IndexPost?cate=Đồ uống">Đồ uống</a>
+                    <a href="/Home/IndexPost?cate=Tráng miệng">Tráng miệng</a>
+                    <a href="/Home/IndexPost?cate=Taco">Taco</a>
+                </div>
+            </div>
+            @* <div class="category-filter">
+                <a>Pizza</a>
+                <a>Burger</a>
+                <a>Đồ uống</a>
+            </div> *@
+            @* @foreach (var item in Model.TblCategory)
             {
                 <div class="row">
                     <div class="col-12">
                         <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
                         <label class="form-check-label" for="flexCheckDefault">
-                        @check.Category.CategoryName
+                        @item.CategoryName
                     </label>
                     </div>
                 </div>
-            } *@
+            }  *@
+            
             
         </div>
         
@@ -43,7 +86,7 @@
                 <div style="border:1px solid gray; padding:10px;" class="post-card">
                     <div class="post-info">
                         <div class="post-author">
-                            <h3>Được tạo bởi - @item.PostAuthor</h3>
+                            <h3>Được tạo bởi - @item.Users.UsersName</h3>
                         </div>
                         <div class="post-create-at">
                             <p>Thời gian tạo - @item.PostCreateAt</p>
@@ -61,11 +104,21 @@
                     <div class="post-image">
                         <a asp-action="PostDetail" asp-route-id="@item.PostId"><img src="/PostImg/@item.PostImg" /></a>
                     </div>
+
+                    @if (@Context.Session.GetInt32("UsersId") != null)
+                    {
+                        <div class="">
+                            <a asp-controller="Home" asp-action="Edit" asp-route-id="@item.PostId">Sửa</a> |
+                            <a asp-controller="Home" asp-action="Delete" asp-route-id="@item.PostId">Xóa</a>
+                        </div>
+                    }
+                    
                 </div>
             }
-            </div>
+            
+        </div>
         
         
     </div>
 </div>
-
+@Html.PagedListPager(Model, page=>Url.Action("IndexPost", new{page=page}))

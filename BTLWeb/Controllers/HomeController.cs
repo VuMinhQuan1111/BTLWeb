@@ -1,10 +1,14 @@
-using BTLWeb.Models;
+﻿using BTLWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using BTLWeb.Models.Dto;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using BTLWeb.Models.Authen;
+using BTLWeb.Models.RequestModels;
+using X.PagedList;
+using Azure;
+using BTLWeb.Areas.Admin.Controllers;
 
 namespace BTLWeb.Controllers
 {
@@ -22,7 +26,7 @@ namespace BTLWeb.Controllers
             _context = context;
         }
 
-        [Authentication]
+        
         public IActionResult Index()
         {
             return View();
@@ -34,26 +38,72 @@ namespace BTLWeb.Controllers
         }
 
 
-        [Authentication]
-        public async Task<IActionResult> IndexPost(string searchString)
+        
+        /*public async Task<IActionResult> IndexPost(string searchString, int? page)*/
+        public IActionResult IndexPost(string searchString, int? page, string searchByCategory, string cate, string alphabet, string alphabet2, string ascending, string descendcing)
         {
-            
-            var btlwebContext = _context.TblPosts.Include(t => t.Category).Include(t => t.Users).OrderByDescending(p => p.PostId);
+
+            int pageSize = 3;
+            int pageNumber = page == null || page < 0 ? 1 : page.Value;
+            var btlwebContext = _context.TblPosts
+                .Include(t => t.Category)
+                .Include(t => t.Users).OrderByDescending(p => p.PostId);
+            PagedList<TblPost> lst = new PagedList<TblPost>(btlwebContext, pageNumber, pageSize);
+
+
+            //var lstpost = (from c in _context.TblCategories
+            //               join p in _context.TblPosts.Include(c => c.Category)
+            //               on c.CategoryId equals p.CategoryId
+            //               select p).ToPagedList();
+
             if (searchString != null)
             {
-                return View(await btlwebContext.Where(s => s.PostTitle.Contains(searchString)).ToListAsync());
-            }
-            else
+                /*return View(await btlwebContext.Where(s => s.PostTitle.Contains(searchString)).ToListAsync());*/
+                return View(btlwebContext.Where(s => s.PostTitle.Contains(searchString)).ToPagedList());
+                /*return View(lst.Where(s => s.PostTitle.Contains(searchString)).ToList());*/
+            } else if (searchByCategory != null)
             {
-                return View(await btlwebContext.ToListAsync());
-                /*return View(await _context.TblPosts.ToListAsync());*/
+                return View(btlwebContext.Where(s => s.Category.CategoryName.Contains(searchByCategory)).ToPagedList());
+            } else if (cate != null)
+            {
+                return View(btlwebContext.Where(s => s.Category.CategoryName == cate).ToPagedList());
             }
-            /*return View(await btlwebContext.ToListAsync());*/
-            /*return View();*/
+            else if (alphabet != null)
+            {
+                //return View((btlwebContext.Where(s => s.PostTitle.OrderDescending).ToPagedList());
+            }
+            else if (descendcing != null)
+            {
+                return View(btlwebContext.OrderByDescending(s => s.PostCreateAt).ToPagedList());
+            } else if (ascending != null)
+            {
+                return View(btlwebContext.OrderBy(s => s.PostCreateAt).ToPagedList());
+            }
+
+
+
+                //var categories = _context.TblCategories.ToList();
+                //categories.Insert(0, new TblCategory { CategoryId = 0, CategoryName = "Chọn danh mục" });
+                //ViewData["CategoryId"] = new SelectList(categories, "CategoryId", "CategoryName");
+
+
+                /*else
+                {
+                    return View(lst);
+                    *//*return View(await btlwebContext.ToListAsync());
+                    return View(await _context.TblPosts.ToListAsync());*//*
+                }*/
+                return View(lst);
+
         }
+
+        
 
         public async Task<IActionResult> PostDetail(int? id, string searchString)
         {
+            //ViewBag.FavCount = _context.TblFavorites.Where(m => m.UsersId == HttpContext.Session.GetInt32("UsersId")).Count();
+            
+            ViewBag.FavCount = _context.TblFavorites.Where(m => m.PostId == id).Count();
             if (id == null)
             {
                 return NotFound();
@@ -62,16 +112,16 @@ namespace BTLWeb.Controllers
             var tblPost = await _context.TblPosts
                 .Include(t => t.Category)
                 .Include(t => t.Users)
+                .Include(t => t.TblComments).ThenInclude(c => c.Users)
+                .Include(t => t.TblFavorites)
                 .FirstOrDefaultAsync(m => m.PostId == id);
-            TblFavorite userfavor = _context.TblFavorites.Where(m => m.Users.UsersName == HttpContext.Session.GetString("username") && m.PostId == id).FirstOrDefault();
+            ViewData["TblPost"] = tblPost;
+            TblFavorite userfavor = _context.TblFavorites.Where(m => m.Users.UsersId == HttpContext.Session.GetInt32("UsersId") && m.PostId == id).FirstOrDefault();
             if (userfavor == null)
             {
-                ViewBag.Like = 1;
+                ViewBag.Fav = 1;
             }
-            else
-            {
-                ViewBag.Like = 2;
-            }
+           
             if (tblPost == null)
             {
                 return NotFound();
@@ -86,18 +136,33 @@ namespace BTLWeb.Controllers
         public IActionResult CreatePost()
         {
             ViewData["CategoryId"] = new SelectList(db.TblCategories, "CategoryId", "CategoryName");
-            ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName");
+            //ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName");
             return View();
         }
 
 
         
         [HttpPost]
-        public async Task<IActionResult> CreatePost([Bind("PostId,UsersId,CategoryId,PostTitle,PostContent,PostImg,PostAuthor,PostCreateAt")] TblPostDto tblPostDto)
+        public async Task<IActionResult> CreatePost([Bind("PostId,UsersId,CategoryId,PostTitle,PostContent,PostImg,PostCreateAt")] TblPostDto tblPostDto)
         {
             try
             {
-                string newFileName = DateTime.Now.ToString("yyyyMMddHHmmssff");
+                if (HttpContext.Session.GetInt32("UsersId") == null)
+                {
+                    return View("Login");
+                }
+                else
+                {
+                    if (tblPostDto.PostImg == null)
+                    {
+                        ModelState.AddModelError("PostImg", "Hãy thêm ảnh bài viết");
+                    }
+                    if (!ModelState.IsValid)
+                    {
+                        ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryName", tblPostDto.CategoryId);
+                        return View(tblPostDto);
+                    }
+                    string newFileName = DateTime.Now.ToString("yyyyMMddHHmmssff");
                 newFileName += Path.GetExtension(tblPostDto.PostImg!.FileName);
 
                 string imageFullPath = _webHostEnvironment.WebRootPath + "/PostImg/" + newFileName;
@@ -108,17 +173,19 @@ namespace BTLWeb.Controllers
 
                 TblPost tblPost = new TblPost()
                 {
-                    UsersId = tblPostDto.UsersId,
+                    UsersId = HttpContext.Session.GetInt32("UsersId") ?? 0,
                     CategoryId = tblPostDto.CategoryId,
                     PostTitle = tblPostDto.PostTitle,
                     PostContent = tblPostDto.PostContent,
                     PostImg = newFileName,
-                    PostAuthor = tblPostDto.PostAuthor,
+                    //PostAuthor = tblPostDto.PostAuthor,
                     PostCreateAt = DateTime.Now
                 };
+                ViewData["UsersId"] = HttpContext.Session.GetInt32("UsersId") ?? 0;
                 _context.Add(tblPost);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("IndexPost", "Home");
+                }
             }
             catch (DbUpdateException ex)
             {
@@ -132,6 +199,74 @@ namespace BTLWeb.Controllers
             ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPostDto.UsersId);
             return View(tblPostDto);
         }
+
+        public IActionResult EditPost(int id)
+        {
+            ViewData["CategoryId"] = new SelectList(db.TblCategories, "CategoryId", "CategoryName");
+            //ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName");
+
+            var tblPost = _context.TblPosts.Find(id);
+
+            if(tblPost == null)
+            {
+                return RedirectToAction("Index", "Posts");
+            }
+
+            var tblPostDto = new TblPostDto()
+            {
+                PostTitle = tblPost.PostTitle,
+                PostContent = tblPost.PostContent,
+
+            };
+            return View(tblPostDto);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var tblPost = _context.TblPosts.Find(id);
+            if (tblPost == null)
+            {
+                return RedirectToAction("Index", "Posts");
+            }
+
+            string ImageFullPath = _webHostEnvironment.WebRootPath + "/PostImg/" + tblPost.PostImg;
+            System.IO.File.Delete(ImageFullPath);
+
+            _context.TblPosts.Remove(tblPost);
+            _context.SaveChanges(true);
+
+            return RedirectToAction("Index", "Posts");
+            
+        }
+
+
+        [Authentication]
+        [HttpPost]
+        public JsonResult AddComments([FromBody] AddComments comments)
+        {
+            if (HttpContext.Session.GetInt32("UsersId") == null)
+            {
+                return Json(new { success = false });
+            }
+            BtlwebContext db = new BtlwebContext();
+            TblComment comment1 = new TblComment()
+            {
+                CommentText = comments.comments,
+                CreateAt = DateTime.Now,
+                PostId = comments.id,
+                UsersId = HttpContext.Session.GetInt32("UsersId") ?? 0, 
+            };
+           
+            /*TblUser? user = db.TblUsers.FirstOrDefault();*/
+            db.TblComments.Add(comment1);
+            db.SaveChanges();
+            Console.WriteLine("Add success");
+            return Json(new { success = true });
+        }
+
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

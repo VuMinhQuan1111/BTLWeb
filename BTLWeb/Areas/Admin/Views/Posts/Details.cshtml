@@ -29,12 +29,12 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.PostImg)
         </dd>
-        <dt class = "col-sm-2">
+        @*<dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.PostAuthor)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.PostAuthor)
-        </dd>
+        </dd>*@
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.PostCreateAt)
         </dt>
@@ -45,13 +45,13 @@
             @Html.DisplayNameFor(model => model.Category)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.CategoryId)
+            @Html.DisplayFor(model => model.Category.CategoryName)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Users)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Users.UsersId)
+            @Html.DisplayFor(model => model.Users.UsersName)
         </dd>
     </dl>
 </div>

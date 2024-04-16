@@ -21,6 +21,8 @@ public partial class BtlwebContext : DbContext
 
     public virtual DbSet<TblFavorite> TblFavorites { get; set; }
 
+    public virtual DbSet<TblFood> TblFoods { get; set; }
+
     public virtual DbSet<TblPost> TblPosts { get; set; }
 
     public virtual DbSet<TblUser> TblUsers { get; set; }
@@ -33,7 +35,7 @@ public partial class BtlwebContext : DbContext
     {
         modelBuilder.Entity<TblCategory>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__tblCateg__D54EE9B4ECAF2B3F");
+            entity.HasKey(e => e.CategoryId).HasName("PK__tblCateg__D54EE9B4EA4BF7AF");
 
             entity.ToTable("tblCategory");
 
@@ -48,70 +50,88 @@ public partial class BtlwebContext : DbContext
 
         modelBuilder.Entity<TblComment>(entity =>
         {
-            entity.HasKey(e => e.CommentId).HasName("PK__tblComme__E79576870678AD55");
+            entity.HasKey(e => e.CommentId).HasName("PK__tblComme__E7957687041685B7");
 
             entity.ToTable("tblComment");
 
-            entity.Property(e => e.CommentId)
-                .ValueGeneratedNever()
-                .HasColumnName("comment_id");
+            entity.Property(e => e.CommentId).HasColumnName("comment_id");
             entity.Property(e => e.CommentText)
-                .HasMaxLength(50)
+                .HasMaxLength(500)
                 .HasColumnName("comment_text");
-            entity.Property(e => e.CreateAt).HasColumnName("create_at");
+            entity.Property(e => e.CreateAt)
+                .HasColumnType("datetime")
+                .HasColumnName("create_at");
             entity.Property(e => e.PostId).HasColumnName("post_id");
             entity.Property(e => e.UsersId).HasColumnName("users_id");
 
             entity.HasOne(d => d.Post).WithMany(p => p.TblComments)
                 .HasForeignKey(d => d.PostId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__tblCommen__post___32AB8735");
+                .HasConstraintName("FK__tblCommen__post___7814D14C");
 
             entity.HasOne(d => d.Users).WithMany(p => p.TblComments)
                 .HasForeignKey(d => d.UsersId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__tblCommen__users__339FAB6E");
+                .HasConstraintName("FK__tblCommen__users__7908F585");
         });
 
         modelBuilder.Entity<TblFavorite>(entity =>
         {
-            entity.HasKey(e => e.FavoriteId).HasName("PK__tblFavor__46ACF4CBE5C51E17");
+            entity.HasKey(e => e.FavoriteId).HasName("PK__tblFavor__46ACF4CB85E0ED40");
 
             entity.ToTable("tblFavorite");
 
-            entity.Property(e => e.FavoriteId)
-                .ValueGeneratedNever()
-                .HasColumnName("favorite_id");
+            entity.Property(e => e.FavoriteId).HasColumnName("favorite_id");
             entity.Property(e => e.PostId).HasColumnName("post_id");
             entity.Property(e => e.UsersId).HasColumnName("users_id");
 
             entity.HasOne(d => d.Post).WithMany(p => p.TblFavorites)
                 .HasForeignKey(d => d.PostId)
-                .HasConstraintName("FK__tblFavori__post___367C1819");
+                .HasConstraintName("FK__tblFavori__post___7BE56230");
 
             entity.HasOne(d => d.Users).WithMany(p => p.TblFavorites)
                 .HasForeignKey(d => d.UsersId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__tblFavori__users__37703C52");
+                .HasConstraintName("FK__tblFavori__users__7CD98669");
+        });
+
+        modelBuilder.Entity<TblFood>(entity =>
+        {
+            entity.HasKey(e => e.FoodId).HasName("PK__tblFood__2F4C4DD89C500619");
+
+            entity.ToTable("tblFood");
+
+            entity.Property(e => e.FoodId).HasColumnName("food_id");
+            entity.Property(e => e.CategoryId).HasColumnName("category_id");
+            entity.Property(e => e.FoodDescription)
+                .HasMaxLength(500)
+                .HasColumnName("food_description");
+            entity.Property(e => e.FoodImg).HasMaxLength(500);
+            entity.Property(e => e.FoodName)
+                .HasMaxLength(50)
+                .HasColumnName("food_name");
+
+            entity.HasOne(d => d.Category).WithMany(p => p.TblFoods)
+                .HasForeignKey(d => d.CategoryId)
+                .HasConstraintName("FK__tblFood__categor__7167D3BD");
         });
 
         modelBuilder.Entity<TblPost>(entity =>
         {
-            entity.HasKey(e => e.PostId).HasName("PK__tblPost__3ED787667901BB0C");
+            entity.HasKey(e => e.PostId).HasName("PK__tblPost__3ED78766099A58E0");
 
             entity.ToTable("tblPost");
 
             entity.Property(e => e.PostId).HasColumnName("post_id");
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
-            entity.Property(e => e.PostAuthor)
-                .HasMaxLength(50)
-                .HasColumnName("post_author");
             entity.Property(e => e.PostContent)
                 .HasMaxLength(500)
                 .HasColumnName("post_content");
-            entity.Property(e => e.PostCreateAt).HasColumnName("post_create_at");
+            entity.Property(e => e.PostCreateAt)
+                .HasColumnType("datetime")
+                .HasColumnName("post_create_at");
             entity.Property(e => e.PostImg)
-                .HasMaxLength(50)
+                .HasMaxLength(2000)
                 .HasColumnName("post_img");
             entity.Property(e => e.PostTitle)
                 .HasMaxLength(100)
@@ -121,17 +141,17 @@ public partial class BtlwebContext : DbContext
             entity.HasOne(d => d.Category).WithMany(p => p.TblPosts)
                 .HasForeignKey(d => d.CategoryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__tblPost__categor__2FCF1A8A");
+                .HasConstraintName("FK__tblPost__categor__753864A1");
 
             entity.HasOne(d => d.Users).WithMany(p => p.TblPosts)
                 .HasForeignKey(d => d.UsersId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__tblPost__users_i__2EDAF651");
+                .HasConstraintName("FK__tblPost__users_i__74444068");
         });
 
         modelBuilder.Entity<TblUser>(entity =>
         {
-            entity.HasKey(e => e.UsersId).HasName("PK__tblUsers__EAA7D14B57460696");
+            entity.HasKey(e => e.UsersId).HasName("PK__tblUsers__EAA7D14BD3E94143");
 
             entity.ToTable("tblUsers");
 

@@ -17,8 +17,6 @@ public partial class TblPost
 
     public string? PostImg { get; set; }
 
-    public string? PostAuthor { get; set; }
-
     public DateTime PostCreateAt { get; set; }
 
     public virtual TblCategory Category { get; set; } = null!;

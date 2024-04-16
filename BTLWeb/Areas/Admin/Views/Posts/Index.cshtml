@@ -5,37 +5,45 @@
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<h1>Index</h1>
+<h1>Danh sách bài viết</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Tạo bài viết</a>
 </p>
 
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.PostTitle)
+                @* @Html.DisplayNameFor(model => model.PostTitle) *@
+                Tên bài viết
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PostContent)
+                @* @Html.DisplayNameFor(model => model.PostContent) *@
+                Nội dung bài viết
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PostImg)
+                @* @Html.DisplayNameFor(model => model.PostImg) *@
+                Ảnh bài viết
             </th>
-            <th>
+            @*<th>
                 @Html.DisplayNameFor(model => model.PostAuthor)
+            </th>*@
+            <th>
+                @* @Html.DisplayNameFor(model => model.PostCreateAt) *@
+                Thời gian tạo
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PostCreateAt)
+                @* @Html.DisplayNameFor(model => model.Category) *@
+                Danh mục
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                @* @Html.DisplayNameFor(model => model.Users) *@
+                Người đăng
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Users)
+                Xử lý
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -50,9 +58,9 @@
             <td>
                 <img src="/PostImg/@item.PostImg" alt="Post Image" width="100" height="100">
             </td>
-            <td>
+            @*<td>
                 @Html.DisplayFor(modelItem => item.PostAuthor)
-            </td>
+                </td>*@
             <td>
                 @Html.DisplayFor(modelItem => item.PostCreateAt)
             </td>
@@ -63,9 +71,9 @@
                 @Html.DisplayFor(modelItem => item.Users.UsersName)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.PostId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PostId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PostId">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.PostId">Sửa</a> |
+                <a asp-action="Details" asp-route-id="@item.PostId">Chi tiết</a> |
+                <a asp-action="Delete" asp-route-id="@item.PostId">Xóa</a>
             </td>
         </tr>
 }
