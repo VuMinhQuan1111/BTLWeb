@@ -40,16 +40,46 @@ namespace BTLWeb.Controllers
 
         
         /*public async Task<IActionResult> IndexPost(string searchString, int? page)*/
-        public IActionResult IndexPost(string searchString, int? page, string searchByCategory, string cate, string alphabet, string alphabet2, string ascending, string descendcing)
+        public IActionResult IndexPost(string searchString, int? page, string searchByCategory, string cate)
         {
 
             int pageSize = 3;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
-            var btlwebContext = _context.TblPosts
+            IQueryable<TblPost> btlwebContext = _context.TblPosts
                 .Include(t => t.Category)
-                .Include(t => t.Users).OrderByDescending(p => p.PostId);
+                .Include(t => t.Users);
             PagedList<TblPost> lst = new PagedList<TblPost>(btlwebContext, pageNumber, pageSize);
-
+            if (Request.Query["sort"].Count() > 0)
+            {
+                string? sort = Request.Query["sort"];
+                if(sort != null)
+                {
+                    switch (sort)
+                    {
+                        case "az":
+                            btlwebContext = btlwebContext.OrderBy(p => p.PostTitle).AsQueryable();
+                            break;
+                        case "za":
+                            btlwebContext = btlwebContext.OrderByDescending(p => p.PostTitle).AsQueryable();
+                            break;
+                        case "latest":
+                            btlwebContext = btlwebContext.OrderByDescending(p => p.PostCreateAt).AsQueryable();
+                            break;
+                        case "oldest":
+                            btlwebContext = btlwebContext.OrderBy(p => p.PostCreateAt).AsQueryable();
+                            break;
+                        default:
+                            btlwebContext = btlwebContext.OrderByDescending(p => p.PostId).AsQueryable();
+                            break;
+                    }
+                } else {
+                    btlwebContext = btlwebContext.OrderByDescending(p => p.PostId).AsQueryable();
+                }
+            }
+            else
+            {
+                btlwebContext = btlwebContext.OrderByDescending(p => p.PostId).AsQueryable();
+            }
 
             //var lstpost = (from c in _context.TblCategories
             //               join p in _context.TblPosts.Include(c => c.Category)
@@ -68,32 +98,20 @@ namespace BTLWeb.Controllers
             {
                 return View(btlwebContext.Where(s => s.Category.CategoryName == cate).ToPagedList());
             }
-            else if (alphabet != null)
+
+
+            //var categories = _context.TblCategories.ToList();
+            //categories.Insert(0, new TblCategory { CategoryId = 0, CategoryName = "Chọn danh mục" });
+            //ViewData["CategoryId"] = new SelectList(categories, "CategoryId", "CategoryName");
+
+
+            /*else
             {
-                //return View((btlwebContext.Where(s => s.PostTitle.OrderDescending).ToPagedList());
-            }
-            else if (descendcing != null)
-            {
-                return View(btlwebContext.OrderByDescending(s => s.PostCreateAt).ToPagedList());
-            } else if (ascending != null)
-            {
-                return View(btlwebContext.OrderBy(s => s.PostCreateAt).ToPagedList());
-            }
-
-
-
-                //var categories = _context.TblCategories.ToList();
-                //categories.Insert(0, new TblCategory { CategoryId = 0, CategoryName = "Chọn danh mục" });
-                //ViewData["CategoryId"] = new SelectList(categories, "CategoryId", "CategoryName");
-
-
-                /*else
-                {
-                    return View(lst);
-                    *//*return View(await btlwebContext.ToListAsync());
-                    return View(await _context.TblPosts.ToListAsync());*//*
-                }*/
                 return View(lst);
+                *//*return View(await btlwebContext.ToListAsync());
+                return View(await _context.TblPosts.ToListAsync());*//*
+            }*/
+            return View(lst);
 
         }
 
@@ -202,7 +220,7 @@ namespace BTLWeb.Controllers
 
         public IActionResult EditPost(int id)
         {
-            ViewData["CategoryId"] = new SelectList(db.TblCategories, "CategoryId", "CategoryName");
+            
             //ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName");
 
             var tblPost = _context.TblPosts.Find(id);
@@ -212,23 +230,94 @@ namespace BTLWeb.Controllers
                 return RedirectToAction("Index", "Posts");
             }
 
+            if (tblPost.UsersId != HttpContext.Session.GetInt32("UsersId"))
+            {
+                return Unauthorized();
+            }
+
             var tblPostDto = new TblPostDto()
             {
+                CategoryId = tblPost.CategoryId,
                 PostTitle = tblPost.PostTitle,
                 PostContent = tblPost.PostContent,
 
+                
             };
+            ViewData["PostImg"] = tblPost.PostImg;
+            ViewData["PostCreateAt"] = tblPost.PostCreateAt.ToString("MM/dd/yyyy");
+            ViewData["CategoryId"] = new SelectList(db.TblCategories, "CategoryId", "CategoryName");
             return View(tblPostDto);
         }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        [HttpPost]
+        public async Task<IActionResult> EditPost(int id, [Bind("UsersId,CategoryId,PostTitle,PostContent,PostImg")] TblPostDto tblPostDto)
         {
             var tblPost = _context.TblPosts.Find(id);
             if (tblPost == null)
             {
-                return RedirectToAction("Index", "Posts");
+                return RedirectToAction("Index", "IndexPost");
+            }
+            if(tblPost.UsersId != HttpContext.Session.GetInt32("UsersId"))
+            {
+                return Unauthorized();
+            }  
+            //if (!ModelState.IsValid)
+            //{
+            //    ViewData["PostImg"] = tblPost.PostImg;
+            //    //ViewData["PostCreateAt"] = tblPost.PostCreateAt.ToString("MM/dd/yyyy");
+            //    ViewData["CategoryId"] = new SelectList(db.TblCategories, "CategoryId", "CategoryName");
+            //    return View(tblPostDto);
+            //}
+
+
+            //Update Image file if have image file
+            string newFileName = tblPost.PostImg;
+            if (tblPostDto.PostImg != null)
+            {
+                newFileName = DateTime.Now.ToString("yyyyMMddHHmmssff");
+                newFileName += Path.GetExtension(tblPostDto.PostImg!.FileName);
+
+                string imageFullPath = _webHostEnvironment.WebRootPath + "/PostImg/" + newFileName;
+                using (var stream = System.IO.File.Create(imageFullPath))
+                {
+                    tblPostDto.PostImg.CopyTo(stream);
+                }
+
+                //Delete Old Image
+                string oldImageFullPath = _webHostEnvironment.WebRootPath + "/PostImg/" + tblPost.PostImg;
+                System.IO.File.Delete(oldImageFullPath);
+            }
+
+            //Update Database
+            tblPost.CategoryId = tblPostDto.CategoryId;
+            tblPost.PostTitle = tblPostDto.PostTitle;
+            tblPost.PostContent = tblPostDto.PostContent;
+            tblPost.PostImg = newFileName;
+            //tblPost.PostAuthor = tblPostDto.PostAuthor;
+
+            ViewData["UserId"] = tblPost.UsersId;
+            ViewData["PostImg"] = tblPost.PostImg;
+            ViewData["PostCreateAt"] = tblPost.PostCreateAt.ToString("MM/dd/yyyy");
+            ViewData["CategoryId"] = new SelectList(_context.TblCategories, "CategoryId", "CategoryName", tblPost.CategoryId);
+            //ViewData["UsersId"] = new SelectList(_context.TblUsers, "UsersId", "UsersName", tblPost.UsersId);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("IndexPost", "Home");
+        }
+
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var tblPost = _context.TblPosts.Find(id);
+
+            if (tblPost == null)
+            {
+                return RedirectToAction("IndexPost", "Home");
+            }
+
+            if (tblPost.UsersId != HttpContext.Session.GetInt32("UsersId"))
+            {
+                return Unauthorized();
             }
 
             string ImageFullPath = _webHostEnvironment.WebRootPath + "/PostImg/" + tblPost.PostImg;
@@ -237,7 +326,7 @@ namespace BTLWeb.Controllers
             _context.TblPosts.Remove(tblPost);
             _context.SaveChanges(true);
 
-            return RedirectToAction("Index", "Posts");
+            return RedirectToAction("IndexPost", "Home");
             
         }
 
